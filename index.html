@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EzArabizi · Smart Arabizi Translator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light dark;
+            --bg: radial-gradient(circle at 10% 20%, #f4d03f 0%, #16a085 45%, #2c3e50 100%);
+            --card-bg: rgba(255, 255, 255, 0.9);
+            --text-color: #1d1d1f;
+            --accent: #ff5f6d;
+            --accent-2: #ffc371;
+            --shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            padding: 2rem;
+            color: var(--text-color);
+        }
+
+        .app-shell {
+            width: min(960px, 100%);
+            background: var(--card-bg);
+            border-radius: 32px;
+            padding: clamp(1.5rem, 4vw, 3rem);
+            box-shadow: var(--shadow);
+            display: grid;
+            gap: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-badge {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            display: grid;
+            place-items: center;
+            color: #fff;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 600;
+        }
+
+        header p {
+            color: #4a4a4a;
+            max-width: 420px;
+        }
+
+        .cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: #101010;
+            color: #fff;
+            border-radius: 999px;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .translator-card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 24px;
+            padding: 2rem;
+            display: grid;
+            gap: 1.5rem;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        label {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #6b6b6b;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        textarea, .output {
+            width: 100%;
+            border: none;
+            border-radius: 18px;
+            padding: 1.2rem 1.4rem;
+            font-size: 1rem;
+            resize: none;
+            min-height: 160px;
+            background: #f6f6f6;
+            line-height: 1.6;
+            color: #1f1f1f;
+            transition: border 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        textarea:focus {
+            outline: 2px solid rgba(255, 95, 109, 0.4);
+            background: #fff;
+            box-shadow: 0 10px 30px rgba(255, 95, 109, 0.15);
+        }
+
+        .output {
+            background: #fff;
+            color: #1f1f1f;
+            min-height: 140px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: right;
+            direction: rtl;
+            font-family: 'Arial', 'Tahoma', 'Arabic Typesetting', 'Segoe UI', sans-serif;
+            font-size: 1.5rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .controls button {
+            flex: 1;
+            min-width: 160px;
+            border: none;
+            border-radius: 999px;
+            padding: 0.95rem 1.2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .controls .primary {
+            background: linear-gradient(120deg, var(--accent), var(--accent-2));
+            color: #fff;
+        }
+
+        .controls .secondary {
+            background: rgba(16, 16, 16, 0.08);
+            color: #101010;
+        }
+
+        .controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.25rem;
+        }
+
+        .results-grid article {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .results-grid h3 {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #6b6b6b;
+            margin-bottom: 0.2rem;
+        }
+
+        .audio-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .audio-links a {
+            padding: 0.6rem 1.1rem;
+            border-radius: 999px;
+            border: 1px solid rgba(0, 0, 0, 0.12);
+            text-decoration: none;
+            color: #101010;
+            font-weight: 500;
+            background: #fff;
+        }
+
+        .audio-links a:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+        }
+
+        .status {
+            font-size: 0.95rem;
+            color: #4a4a4a;
+        }
+
+        .status.error {
+            color: #c0392b;
+        }
+
+        @media (max-width: 640px) {
+            .app-shell {
+                border-radius: 20px;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="app-shell">
+        <header>
+            <div class="logo">
+                <div class="logo-badge">Ez</div>
+                <div>
+                    <h1>EzArabizi</h1>
+                    <p>Translate Arabizi chats into beautiful Arabic script in one tap.</p>
+                </div>
+            </div>
+            <a class="cta" href="#translator">Start Translating</a>
+        </header>
+
+        <section id="translator" class="translator-card">
+            <div>
+                <label for="inputText">Arabizi Input</label>
+                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
+            </div>
+            <div class="controls">
+                <button class="secondary" id="demoFill">Try Sample</button>
+                <button class="primary" id="translateBtn">Translate</button>
+            </div>
+            <div class="results-grid">
+                <article>
+                    <h3>Arabic (Raw)</h3>
+                    <div id="arabicRaw" class="output">Start typing to see the translation.</div>
+                </article>
+                <article>
+                    <h3>Arabic (Corrected)</h3>
+                    <div id="arabicCorrected" class="output">—</div>
+                </article>
+                <article>
+                    <h3>English</h3>
+                    <div id="englishText" class="output" dir="ltr" style="text-align:left;">—</div>
+                </article>
+            </div>
+            <div class="audio-links">
+                <a id="arabicAudioLink" href="#" target="_blank" rel="noopener" style="display:none;">Play Arabic Audio ↗</a>
+                <a id="englishAudioLink" href="#" target="_blank" rel="noopener" style="display:none;">Play English Audio ↗</a>
+            </div>
+            <p id="status" class="status">Ready.</p>
+        </section>
+    </main>
+
+    <script>
+        const input = document.getElementById('inputText');
+        const translateBtn = document.getElementById('translateBtn');
+        const demoBtn = document.getElementById('demoFill');
+        const arabicRawEl = document.getElementById('arabicRaw');
+        const arabicCorrectedEl = document.getElementById('arabicCorrected');
+        const englishTextEl = document.getElementById('englishText');
+        const arabicAudioLink = document.getElementById('arabicAudioLink');
+        const englishAudioLink = document.getElementById('englishAudioLink');
+        const statusEl = document.getElementById('status');
+
+        // Your Flask app2.py is running on this URL/port:
+        const API_BASE = 'https://snkuwari.pythonanywhere.com';
+
+        const sample = "sabah el kheir ya habibi! ana bhebak kteer.";
+
+        function toggleLoading(isLoading) {
+            translateBtn.disabled = isLoading;
+            translateBtn.textContent = isLoading ? 'Translating…' : 'Translate';
+            statusEl.textContent = isLoading ? 'Generating translation and audio…' : 'Ready.';
+            statusEl.classList.remove('error');
+        }
+
+        function renderResults(data) {
+            console.log('Render data:', data);
+
+            arabicRawEl.textContent = data && data.arabic_raw ? data.arabic_raw : '—';
+            arabicCorrectedEl.textContent = data && data.arabic_corrected ? data.arabic_corrected : '—';
+            englishTextEl.textContent = data && data.english ? data.english : '—';
+
+            if (data && data.arabic_audio_url) {
+                arabicAudioLink.href = data.arabic_audio_url;
+                arabicAudioLink.style.display = 'inline-flex';
+            } else {
+                arabicAudioLink.removeAttribute('href');
+                arabicAudioLink.style.display = 'none';
+            }
+
+            if (data && data.english_audio_url) {
+                englishAudioLink.href = data.english_audio_url;
+                englishAudioLink.style.display = 'inline-flex';
+            } else {
+                englishAudioLink.removeAttribute('href');
+                englishAudioLink.style.display = 'none';
+            }
+        }
+
+        async function handleTranslate() {
+            const text = input.value.trim();
+            if (!text) {
+                statusEl.textContent = 'Please enter some Arabizi text.';
+                statusEl.classList.add('error');
+                return;
+            }
+
+            toggleLoading(true);
+            console.log('Sending to:', `${API_BASE}/translate`);
+
+            try {
+                const response = await fetch(`${API_BASE}/translate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text })
+                });
+
+                console.log('Response status:', response.status);
+
+                if (!response.ok) {
+                    const errText = await response.text();
+                    console.error('Server error response body:', errText);
+                    statusEl.textContent = 'Server error while translating.';
+                    statusEl.classList.add('error');
+                    return;
+                }
+
+                const data = await response.json();
+                console.log('Parsed JSON:', data);
+
+                renderResults(data);
+                statusEl.textContent = 'Translation complete.';
+            } catch (error) {
+                console.error('Fetch error:', error);
+                statusEl.textContent = 'Unable to reach the translator server. Is Flask running on 127.0.0.1:5000?';
+                statusEl.classList.add('error');
+            } finally {
+                toggleLoading(false);
+            }
+        }
+
+        translateBtn.addEventListener('click', handleTranslate);
+
+        demoBtn.addEventListener('click', () => {
+            input.value = sample;
+            handleTranslate();
+        });
+    </script>
+</body>
+</html>
