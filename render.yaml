@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: ezarabizi
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app2:app
+    plan: free
