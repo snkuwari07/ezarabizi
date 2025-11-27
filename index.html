@@ -1,1154 +1,384 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzArabizi · Smart Arabizi Translator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            color-scheme: light dark;
-            --bg: radial-gradient(circle at 10% 20%, #f4d03f 0%, #16a085 45%, #2c3e50 100%);
-            --card-bg: rgba(255, 255, 255, 0.92);
-            --text-color: #1d1d1f;
-            --accent: #ff5f6d;
-            --accent-2: #ffc371;
-            --shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-        }
-
-        * {
-            box-sizing: border-box;
-            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-            padding: 2rem;
-            color: var(--text-color);
-            transition: background 0.2s ease;
-            overflow-x: hidden;
-            position: relative;
-        }
-
-        /* floating background glow behind the app */
-        body::before,
-        body::after {
-            content: "";
-            position: fixed;
-            width: 420px;
-            height: 420px;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.4;
-            z-index: -2;
-        }
-
-        body::before {
-            background: #ff5f6d;
-            top: -120px;
-            left: -100px;
-        }
-
-        body::after {
-            background: #16a085;
-            bottom: -160px;
-            right: -120px;
-        }
-
-        .app-shell {
-            width: min(960px, 100%);
-            background: var(--card-bg);
-            border-radius: 32px;
-            padding: clamp(1.5rem, 4vw, 3rem);
-            box-shadow: var(--shadow);
-            display: grid;
-            gap: 2rem;
-            position: relative;
-            overflow: hidden;
-            animation: floatIn 0.7s ease-out;
-        }
-
-        .app-shell::before {
-            content: "";
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            background: linear-gradient(120deg, rgba(255,95,109,0.5), rgba(255,195,113,0.4));
-            z-index: -1;
-            opacity: 0.7;
-        }
-
-        .app-shell::after {
-            content: "";
-            position: absolute;
-            inset: 2px;
-            border-radius: inherit;
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
-            z-index: -1;
-        }
-
-        @keyframes floatIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px) scale(0.98);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        .logo-badge {
-            width: 50px;
-            height: 50px;
-            border-radius: 18px;
-            background: radial-gradient(circle at 20% 20%, #fff 0%, #ff5f6d 35%, #ffc371 100%);
-            display: grid;
-            place-items: center;
-            color: #fff;
-            font-weight: 700;
-            font-size: 1.3rem;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
-        }
-
-        h1 {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 600;
-        }
-
-        header p {
-            color: #4a4a4a;
-            max-width: 420px;
-        }
-
-        .header-actions {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-            align-items: flex-end;
-        }
-
-        .cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: #101010;
-            color: #fff;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 500;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .elder-toggle {
-            border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.15);
-            padding: 0.4rem 0.9rem;
-            background: #fff;
-            font-size: 0.85rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.35rem;
-            cursor: pointer;
-        }
-
-        .feature-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.45rem;
-            margin-top: 0.5rem;
-        }
-
-        .chip {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.65rem;
-            border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(255,255,255,0.85);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #555;
-        }
-
-        .translator-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
-            padding: 2rem;
-            display: grid;
-            gap: 1.5rem;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #6b6b6b;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        textarea, .output {
-            width: 100%;
-            border: none;
-            border-radius: 18px;
-            padding: 1.2rem 1.4rem;
-            font-size: 1rem;
-            resize: none;
-            min-height: 160px;
-            background: #f6f6f6;
-            line-height: 1.6;
-            color: #1f1f1f;
-            transition: border 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-        }
-
-        textarea:focus {
-            outline: 2px solid rgba(255, 95, 109, 0.4);
-            background: #fff;
-            box-shadow: 0 10px 30px rgba(255, 95, 109, 0.15);
-        }
-
-        .char-counter {
-            text-align: right;
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 0.3rem;
-        }
-
-        .output {
-            background: #fff;
-            color: #1f1f1f;
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: right;
-            direction: rtl;
-            font-family: 'Arial', 'Tahoma', 'Arabic Typesetting', 'Segoe UI', sans-serif;
-            font-size: 1.5rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .controls button {
-            flex: 1;
-            min-width: 160px;
-            border: none;
-            border-radius: 999px;
-            padding: 0.95rem 1.2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .controls .primary {
-            background: linear-gradient(120deg, var(--accent), var(--accent-2));
-            color: #fff;
-            animation: pulseSoft 2.6s ease-in-out infinite;
-        }
-
-        @keyframes pulseSoft {
-            0%, 100% {
-                transform: translateY(0);
-                box-shadow: 0 10px 24px rgba(255,95,109,0.35);
-            }
-            50% {
-                transform: translateY(-1px);
-                box-shadow: 0 14px 32px rgba(255,95,109,0.45);
-            }
-        }
-
-        .controls .secondary {
-            background: rgba(16, 16, 16, 0.08);
-            color: #101010;
-        }
-
-        .controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .results-grid article {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .results-grid h3 {
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #6b6b6b;
-            margin-bottom: 0.2rem;
-        }
-
-        .copy-btn {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            font-size: 0.75rem;
-            border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.15);
-            background: rgba(255,255,255,0.9);
-            padding: 0.15rem 0.6rem;
-            cursor: pointer;
-        }
-
-        .audio-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 1rem;
-            margin-top: 0.75rem;
-        }
-
-        .audio-block {
-            background: #fff;
-            border-radius: 16px;
-            padding: 0.8rem 1rem;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-        }
-
-        .audio-label {
-            font-size: 0.85rem;
-            color: #6b6b6b;
-            margin-bottom: 0.3rem;
-        }
-
-        .audio-block audio {
-            width: 100%;
-        }
-
-        .status {
-            font-size: 0.95rem;
-            color: #4a4a4a;
-            margin-top: 0.5rem;
-        }
-
-        .status.error {
-            color: #c0392b;
-        }
-
-        /* History styles */
-        .history-card {
-            background: rgba(255,255,255,0.9);
-            border-radius: 24px;
-            padding: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.05);
-        }
-
-        .history-card h2 {
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #6b6b6b;
-            margin-bottom: 0.75rem;
-        }
-
-        .history-list {
-            display: grid;
-            gap: 0.75rem;
-            max-height: 220px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            padding: 0.7rem 0.9rem;
-            border-radius: 14px;
-            background: #f8f8f8;
-            border: 1px solid rgba(0,0,0,0.06);
-            font-size: 0.9rem;
-        }
-
-        .history-arabizi {
-            color: #6b6b6b;
-            margin-bottom: 0.15rem;
-        }
-
-        .history-arabic {
-            direction: rtl;
-            text-align: right;
-        }
-
-        .history-english {
-            color: #333;
-            margin-top: 0.1rem;
-        }
-
-        /* Elder mode */
-        body.elder-mode {
-            background: #f2f2f2;
-        }
-
-        body.elder-mode .output {
-            font-size: 2rem;
-        }
-
-        body.elder-mode textarea {
-            font-size: 1.1rem;
-        }
-
-        body.elder-mode .status {
-            font-size: 1.05rem;
-        }
-
-        /* Footer */
-        .footer {
-            margin-top: 0.5rem;
-            text-align: center;
-            font-size: 0.9rem;
-            color: #555;
-            border-top: 1px solid rgba(0,0,0,0.08);
-            padding-top: 0.5rem;
-        }
-
-        .footer-contact {
-            margin-top: 0.25rem;
-            font-size: 0.9rem;
-            color: #333;
-        }
-
-        @media (max-width: 640px) {
-            .app-shell {
-                border-radius: 20px;
-            }
-
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .header-actions {
-                align-items: flex-start;
-            }
-
-            .controls {
-                flex-direction: column;
-            }
-        }
-
-        /* WELCOME OVERLAY */
-        .welcome-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 10% 20%, #f4d03f 0%, #16a085 45%, #2c3e50 100%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            transition: opacity 0.3s ease;
-        }
-
-        .welcome-inner {
-            max-width: 480px;
-            width: 90%;
-            background: rgba(255,255,255,0.95);
-            border-radius: 24px;
-            padding: 2rem 2.2rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-            text-align: center;
-        }
-
-        .welcome-title {
-            font-size: 2rem;
-            margin-bottom: 0.75rem;
-        }
-
-        .welcome-text {
-            font-size: 1rem;
-            color: #555;
-            margin-bottom: 1.5rem;
-        }
-
-        .welcome-btn {
-            border: none;
-            border-radius: 999px;
-            padding: 0.9rem 1.8rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            background: linear-gradient(120deg, var(--accent), var(--accent-2));
-            color: #fff;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-
-        .welcome-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
-        }
-
-        .welcome-overlay.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EzArabizi · Smart Arabizi Translator</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: radial-gradient(circle at 10% 20%, #f4d03f 0%, #16a085 45%, #2c3e50 100%);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --text: #101010;
+      --muted: #6b6b6b;
+      --accent: #ff6b6b;
+      --accent-2: #ff9a3c;
+      --accent-soft: rgba(255, 107, 107, 0.08);
+      --radius-xl: 24px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.16);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-image: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      color: var(--text);
+    }
+
+    main {
+      width: 100%;
+      max-width: 1120px;
+      background: var(--card-bg);
+      border-radius: 32px;
+      box-shadow: var(--shadow-soft);
+      padding: 1.75rem;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.4fr);
+      gap: 2rem;
+    }
+
+    @media (max-width: 900px) {
+      main {
+        grid-template-columns: 1fr;
+        padding: 1.5rem;
+      }
+    }
+
+    /* Left side – intro */
+    .intro {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .logo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.25rem 0.8rem 0.25rem 0.25rem;
+      border-radius: 999px;
+      background: #101010;
+      color: #fff;
+      font-size: 0.85rem;
+      font-weight: 500;
+      width: fit-content;
+    }
+
+    .logo-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .tagline {
+      margin-top: 0.75rem;
+    }
+
+    .tagline h1 {
+      font-size: clamp(1.9rem, 2.7vw, 2.6rem);
+      line-height: 1.1;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+    }
+
+    .tagline p {
+      font-size: 0.95rem;
+      color: var(--muted);
+      max-width: 420px;
+    }
+
+    .bullet {
+      margin-top: 1.25rem;
+      padding: 0.75rem 0.9rem;
+      border-radius: 18px;
+      background: var(--accent-soft);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .bullet span {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .footer-note {
+      margin-top: auto;
+      font-size: 0.8rem;
+      color: var(--muted);
+      opacity: 0.9;
+    }
+
+    /* Right side – translator */
+    .translator-card {
+      background: #fff;
+      border-radius: var(--radius-xl);
+      padding: 1.5rem;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .translator-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .translator-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+
+    .translator-pill {
+      font-size: 0.8rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      background: #f4f4f4;
+      color: var(--muted);
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      border-radius: 18px;
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      padding: 1rem 1.1rem;
+      resize: vertical;
+      min-height: 150px;
+      font-family: inherit;
+      font-size: 0.98rem;
+      line-height: 1.5;
+      outline: none;
+      background: #f6f6f6;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    textarea:focus {
+      border-color: rgba(255, 107, 107, 0.6);
+      background: #fff;
+      box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.1);
+    }
+
+    textarea[readonly] {
+      background: #fdfdfd;
+    }
+
+    .controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 1.8rem;
+      font-size: 0.96rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 10px 30px rgba(255, 107, 107, 0.4);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+      min-width: 140px;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 40px rgba(255, 107, 107, 0.5);
+      opacity: 0.96;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: default;
+      transform: none;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+    }
+
+    .status {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .status.error {
+      color: #d7263d;
+    }
+
+    .status.success {
+      color: #189b52;
+    }
+
+    .small-hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+  </style>
 </head>
 <body>
-    <!-- WELCOME PAGE OVERLAY -->
-    <div id="welcomeOverlay" class="welcome-overlay">
-        <div class="welcome-inner">
-            <h2 class="welcome-title">Welcome to EzArabizi</h2>
-            <p class="welcome-text">
-                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English — with audio they can listen to easily.
-            </p>
-            <button id="startBtn" class="welcome-btn">Start Translating</button>
+  <main>
+    <!-- LEFT SIDE -->
+    <section class="intro">
+      <div>
+        <div class="logo-pill">
+          <div class="logo-circle">EZ</div>
+          EzArabizi
         </div>
-    </div>
 
-    <main class="app-shell">
-        <header>
-            <div class="logo">
-                <div class="logo-badge">Ez</div>
-                <div>
-                    <h1>EzArabizi</h1>
-                    <p>Translate Arabizi chats into beautiful Arabic script in one tap.</p>
-                    <div class="feature-chips">
-                        <span class="chip">🔊 Audio for elders</span>
-                        <span class="chip">🧓 Elder-friendly mode</span>
-                        <span class="chip">🤖 Smart correction</span>
-                    </div>
-                </div>
-            </div>
-            <div class="header-actions">
-                <a class="cta" href="#translator">Go to Translator</a>
-                <button class="elder-toggle" id="elderToggle">👵 Elder Mode</button>
-            </div>
-        </header>
+        <div class="tagline">
+          <h1>Translate Arabizi into clear Arabic with one tap.</h1>
+          <p>
+            Designed for elders who receive Arabizi messages from family and want to read them in comfortable Arabic script.
+          </p>
+        </div>
 
-        <section id="translator" class="translator-card">
-            <div>
-                <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
-                <div id="charCounter" class="char-counter">0 characters</div>
-            </div>
-            <div class="controls">
-                <button class="secondary" id="demoFill">Try Sample</button>
-                <button class="primary" id="translateBtn">Translate</button>
-            </div>
-            <div class="results-grid">
-                <article>
-                    <h3>Arabic (Raw)</h3>
-                    <div id="arabicRaw" class="output">
-                        <button class="copy-btn" data-target="arabicRaw">Copy</button>
-                        Start typing to see the translation.
-                    </div>
-                </article>
-                <article>
-                    <h3>Arabic (Corrected)</h3>
-                    <div id="arabicCorrected" class="output">
-                        <button class="copy-btn" data-target="arabicCorrected">Copy</button>
-                        —
-                    </div>
-                </article>
-                <article>
-                    <h3>English</h3>
-                    <div id="englishText" class="output" dir="ltr" style="text-align:left;">
-                        <button class="copy-btn" data-target="englishText">Copy</button>
-                        —
-                    </div>
-                </article>
-            </div>
+        <div class="bullet">
+          <span>👵</span>
+          <div>Simple layout, large text, and right-to-left output for easier reading.</div>
+        </div>
+      </div>
 
-            <!-- INLINE AUDIO PLAYERS -->
-            <div class="audio-row">
-                <div class="audio-block">
-                    <div class="audio-label">🔊 Listen in Arabic</div>
-                    <audio id="arabicAudio" controls style="display:none;"></audio>
-                </div>
-                <div class="audio-block">
-                    <div class="audio-label">🔊 Listen in English</div>
-                    <audio id="englishAudio" controls style="display:none;"></audio>
-                </div>
-            </div>
+      <p class="footer-note">
+        Tip: you can paste any Arabizi sentence from WhatsApp and press “Translate to Arabic”.
+      </p>
+    </section>
 
-            <p id="status" class="status">Ready.</p>
-        </section>
+    <!-- RIGHT SIDE -->
+    <section class="translator-card">
+      <header class="translator-header">
+        <div class="translator-title">EzArabizi Translator</div>
+        <div class="translator-pill">Arabizi ➝ Arabic</div>
+      </header>
 
-        <!-- HISTORY SECTION -->
-        <section class="history-card">
-            <h2>Recent Translations</h2>
-            <div id="historyList" class="history-list">
-                <p style="font-size:0.9rem;color:#6b6b6b;">Your last translations will appear here.</p>
-            </div>
-        </section>
+      <div class="field-group">
+        <label for="arabizi-input">Arabizi input</label>
+        <textarea
+          id="arabizi-input"
+          placeholder="e.g. &quot;sabah el khair habibi, shlonch elyoum?&quot;">
+        </textarea>
+        <div class="small-hint">Write or paste the Arabizi message here.</div>
+      </div>
 
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p>
-                Made by Saad and 
-                <a href="https://youtu.be/bOd7a8NxiNA?t=8"
-                   target="_blank"
-                   style="color:#555; text-decoration:none; font-weight:600;">
-                    Sari
-                </a>
-            </p>
-            <p class="footer-contact">
-                Contact: <span id="contactDetails">add your email / Instagram / phone here</span>
-            </p>
-        </footer>
-    </main>
+      <div class="controls-row">
+        <button id="translate-btn" class="btn-primary">
+          <span id="translate-btn-label">Translate to Arabic</span>
+        </button>
+        <div id="status" class="status">Ready.</div>
+      </div>
 
-    <script>
-        const input = document.getElementById('inputText');
-        const translateBtn = document.getElementById('translateBtn');
-        const demoBtn = document.getElementById('demoFill');
-        const arabicRawEl = document.getElementById('arabicRaw');
-        const arabicCorrectedEl = document.getElementById('arabicCorrected');
-        const englishTextEl = document.getElementById('englishText');
-        const arabicAudioEl = document.getElementById('arabicAudio');
-        const englishAudioEl = document.getElementById('englishAudio');
-        const statusEl = document.getElementById('status');
-        const elderToggleBtn = document.getElementById('elderToggle');
-        const historyListEl = document.getElementById('historyList');
-        const charCounterEl = document.getElementById('charCounter');
+      <div class="field-group">
+        <label for="arabic-output">Arabic output</label>
+        <textarea id="arabic-output" readonly placeholder="The Arabic translation will appear here."></textarea>
+      </div>
+    </section>
+  </main>
 
-        const welcomeOverlay = document.getElementById('welcomeOverlay');
-        const startBtn = document.getElementById('startBtn');
+  <script>
+    // ❶ PUT YOUR REAL BACKEND URL HERE:
+    // Example: "https://ezarabizi-backend.onrender.com/translate"
+    const API_URL = "https://ezarabizi.onrender.com/translate";
 
-        const sample = "sabah el kheir ya habibi! ana t3ban shwy bs ok.";
-        const history = []; // store last translations
 
-        // API base (local or deployed)
-        const API_BASE = window.location.origin.startsWith('http')
-            ? window.location.origin
-            : 'http://127.0.0.1:5000';
+    const inputEl = document.getElementById("arabizi-input");
+    const outputEl = document.getElementById("arabic-output");
+    const btn = document.getElementById("translate-btn");
+    const btnLabel = document.getElementById("translate-btn-label");
+    const statusEl = document.getElementById("status");
 
-        function toggleLoading(isLoading) {
-            translateBtn.disabled = isLoading;
-            translateBtn.textContent = isLoading ? 'Translating…' : 'Translate';
-            statusEl.textContent = isLoading ? 'Generating translation and audio…' : 'Ready.';
-            statusEl.classList.toggle('error', false);
-        }
+    async function translateText() {
+      const text = inputEl.value.trim();
+      if (!text) {
+        statusEl.textContent = "Please type something in Arabizi first.";
+        statusEl.className = "status error";
+        return;
+      }
 
-        function renderHistory() {
-            if (history.length === 0) {
-                historyListEl.innerHTML = '<p style="font-size:0.9rem;color:#6b6b6b;">Your last translations will appear here.</p>';
-                return;
-            }
+      btn.disabled = true;
+      btnLabel.textContent = "Translating…";
+      statusEl.textContent = "Contacting translator…";
+      statusEl.className = "status";
 
-            historyListEl.innerHTML = "";
-            history.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
-                div.innerHTML = `
-                    <div class="history-arabizi"><strong>Arabizi:</strong> ${item.input}</div>
-                    <div class="history-arabic">${item.arabic}</div>
-                    <div class="history-english">${item.english}</div>
-                `;
-                historyListEl.appendChild(div);
-            });
-        }
-
-        function renderResults(data, originalInput) {
-            const raw = data?.arabic_raw || '—';
-            const corrected = data?.arabic_corrected || raw || '—';
-            const english = data?.english || '—';
-
-            // overwrite the text content (keeping the copy button)
-            arabicRawEl.childNodes[arabicRawEl.childNodes.length - 1].textContent = raw;
-            arabicCorrectedEl.childNodes[arabicCorrectedEl.childNodes.length - 1].textContent = corrected;
-            englishTextEl.childNodes[englishTextEl.childNodes.length - 1].textContent = english;
-
-            // Arabic audio
-            if (data?.arabic_audio_url) {
-                const url = data.arabic_audio_url.startsWith('http')
-                    ? data.arabic_audio_url
-                    : `${API_BASE}${data.arabic_audio_url}`;
-                arabicAudioEl.src = url;
-                arabicAudioEl.style.display = 'block';
-            } else {
-                arabicAudioEl.removeAttribute('src');
-                arabicAudioEl.style.display = 'none';
-            }
-
-            // English audio
-            if (data?.english_audio_url) {
-                const url = data.english_audio_url.startsWith('http')
-                    ? data.english_audio_url
-                    : `${API_BASE}${data.english_audio_url}`;
-                englishAudioEl.src = url;
-                englishAudioEl.style.display = 'block';
-            } else {
-                englishAudioEl.removeAttribute('src');
-                englishAudioEl.style.display = 'none';
-            }
-
-            // Update history (keep last 5)
-            history.unshift({
-                input: originalInput,
-                arabic: corrected,
-                english: english
-            });
-            if (history.length > 5) history.pop();
-            renderHistory();
-        }
-
-        async function handleTranslate() {
-            const text = input.value.trim();
-            if (!text) {
-                statusEl.textContent = 'Please enter some Arabizi text.';
-                statusEl.classList.add('error');
-                return;
-            }
-
-            toggleLoading(true);
-            try {
-                const response = await fetch(`${API_BASE}/translate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-
-                if (!response.ok) {
-                    throw new Error('Translation request failed.');
-                }
-
-                const data = await response.json();
-                renderResults(data, text);
-                statusEl.textContent = 'Translation complete.';
-            } catch (error) {
-                console.error(error);
-                statusEl.textContent = 'Unable to reach the translator server. Is Flask running and API_BASE correct?';
-                statusEl.classList.add('error');
-            } finally {
-                toggleLoading(false);
-            }
-        }
-
-        // Copy buttons
-        document.addEventListener('click', async (e) => {
-            if (e.target.matches('.copy-btn')) {
-                const targetId = e.target.getAttribute('data-target');
-                const el = document.getElementById(targetId);
-                if (!el) return;
-
-                const text = el.textContent.replace('Copy', '').trim();
-                try {
-                    await navigator.clipboard.writeText(text);
-                    const original = e.target.textContent;
-                    e.target.textContent = 'Copied!';
-                    setTimeout(() => {
-                        e.target.textContent = original;
-                    }, 1000);
-                } catch {
-                    alert('Unable to copy text.');
-                }
-            }
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ text })
         });
 
-        // Elder mode toggle
-        elderToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('elder-mode');
-            elderToggleBtn.textContent = document.body.classList.contains('elder-mode')
-                ? '👵 Elder Mode: ON'
-                : '👵 Elder Mode';
-        });
-
-        // Welcome screen logic
-        startBtn.addEventListener('click', () => {
-            welcomeOverlay.classList.add('hidden');
-            setTimeout(() => {
-                welcomeOverlay.style.display = 'none';
-                const translatorSection = document.getElementById('translator');
-                translatorSection.scrollIntoView({ behavior: 'smooth' });
-            }, 300);
-        });
-
-        // Character counter
-        input.addEventListener('input', () => {
-            const len = input.value.length;
-            charCounterEl.textContent = `${len} character${len === 1 ? '' : 's'}`;
-        });
-
-        translateBtn.addEventListener('click', handleTranslate);
-        demoBtn.addEventListener('click', () => {
-            input.value = sample;
-            charCounterEl.textContent = `${sample.length} characters`;
-            handleTranslate();
-        });
-    </script>
-</body>
-</html>
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-2));
-            display: grid;
-            place-items: center;
-            color: #fff;
-            font-weight: 600;
-            font-size: 1.25rem;
+        if (!response.ok) {
+          throw new Error("Server error: " + response.status);
         }
 
-        h1 {
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            font-weight: 600;
-        }
+        const data = await response.json();
+        // Expecting: { translation: "..." }
+        outputEl.value = data.translation || "";
+        statusEl.textContent = "Done ✅";
+        statusEl.className = "status success";
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = "Something went wrong. Check the backend URL or try again.";
+        statusEl.className = "status error";
+      } finally {
+        btn.disabled = false;
+        btnLabel.textContent = "Translate to Arabic";
+      }
+    }
 
-        header p {
-            color: #4a4a4a;
-            max-width: 420px;
-        }
-
-        .cta {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.75rem 1.5rem;
-            background: #101010;
-            color: #fff;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .cta:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-        }
-
-        .translator-card {
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 24px;
-            padding: 2rem;
-            display: grid;
-            gap: 1.5rem;
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #6b6b6b;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-        }
-
-        textarea, .output {
-            width: 100%;
-            border: none;
-            border-radius: 18px;
-            padding: 1.2rem 1.4rem;
-            font-size: 1rem;
-            resize: none;
-            min-height: 160px;
-            background: #f6f6f6;
-            line-height: 1.6;
-            color: #1f1f1f;
-            transition: border 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        textarea:focus {
-            outline: 2px solid rgba(255, 95, 109, 0.4);
-            background: #fff;
-            box-shadow: 0 10px 30px rgba(255, 95, 109, 0.15);
-        }
-
-        .output {
-            background: #fff;
-            color: #1f1f1f;
-            min-height: 140px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: right;
-            direction: rtl;
-            font-family: 'Arial', 'Tahoma', 'Arabic Typesetting', 'Segoe UI', sans-serif;
-            font-size: 1.5rem;
-            line-height: 1.8;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1rem;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .controls button {
-            flex: 1;
-            min-width: 160px;
-            border: none;
-            border-radius: 999px;
-            padding: 0.95rem 1.2rem;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .controls .primary {
-            background: linear-gradient(120deg, var(--accent), var(--accent-2));
-            color: #fff;
-        }
-
-        .controls .secondary {
-            background: rgba(16, 16, 16, 0.08);
-            color: #101010;
-        }
-
-        .controls button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.25rem;
-        }
-
-        .results-grid article {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .results-grid h3 {
-            font-size: 0.95rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: #6b6b6b;
-            margin-bottom: 0.2rem;
-        }
-
-        .audio-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.75rem;
-        }
-
-        .audio-links a {
-            padding: 0.6rem 1.1rem;
-            border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.12);
-            text-decoration: none;
-            color: #101010;
-            font-weight: 500;
-            background: #fff;
-        }
-
-        .audio-links a:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-        }
-
-        .status {
-            font-size: 0.95rem;
-            color: #4a4a4a;
-        }
-
-        .status.error {
-            color: #c0392b;
-        }
-
-        @media (max-width: 640px) {
-            .app-shell {
-                border-radius: 20px;
-            }
-
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-            }
-
-            .controls {
-                flex-direction: column;
-            }
-        }
-    </style>
-</head>
-<body>
-    <main class="app-shell">
-        <header>
-            <div class="logo">
-                <div class="logo-badge">Ez</div>
-                <div>
-                    <h1>EzArabizi</h1>
-                    <p>Translate Arabizi chats into beautiful Arabic script in one tap.</p>
-                </div>
-            </div>
-            <a class="cta" href="#translator">Start Translating</a>
-        </header>
-
-        <section id="translator" class="translator-card">
-            <div>
-                <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
-            </div>
-            <div class="controls">
-                <button class="secondary" id="demoFill">Try Sample</button>
-                <button class="primary" id="translateBtn">Translate</button>
-            </div>
-            <div class="results-grid">
-                <article>
-                    <h3>Arabic (Raw)</h3>
-                    <div id="arabicRaw" class="output">Start typing to see the translation.</div>
-                </article>
-                <article>
-                    <h3>Arabic (Corrected)</h3>
-                    <div id="arabicCorrected" class="output">—</div>
-                </article>
-                <article>
-                    <h3>English</h3>
-                    <div id="englishText" class="output" dir="ltr" style="text-align:left;">—</div>
-                </article>
-            </div>
-            <div class="audio-links">
-                <a id="arabicAudioLink" href="#" target="_blank" rel="noopener" style="display:none;">Play Arabic Audio ↗</a>
-                <a id="englishAudioLink" href="#" target="_blank" rel="noopener" style="display:none;">Play English Audio ↗</a>
-            </div>
-            <p id="status" class="status">Ready.</p>
-        </section>
-    </main>
-
-    <script>
-        const input = document.getElementById('inputText');
-        const translateBtn = document.getElementById('translateBtn');
-        const demoBtn = document.getElementById('demoFill');
-        const arabicRawEl = document.getElementById('arabicRaw');
-        const arabicCorrectedEl = document.getElementById('arabicCorrected');
-        const englishTextEl = document.getElementById('englishText');
-        const arabicAudioLink = document.getElementById('arabicAudioLink');
-        const englishAudioLink = document.getElementById('englishAudioLink');
-        const statusEl = document.getElementById('status');
-
-        // Your Flask app2.py is running on this URL/port:
-        const API_BASE = 'https://ezarabizi.onrender.com';
-
-
-        const sample = "sabah el kheir ya habibi! ana bhebak kteer.";
-
-        function toggleLoading(isLoading) {
-            translateBtn.disabled = isLoading;
-            translateBtn.textContent = isLoading ? 'Translating…' : 'Translate';
-            statusEl.textContent = isLoading ? 'Generating translation and audio…' : 'Ready.';
-            statusEl.classList.remove('error');
-        }
-
-        function renderResults(data) {
-            console.log('Render data:', data);
-
-            arabicRawEl.textContent = data && data.arabic_raw ? data.arabic_raw : '—';
-            arabicCorrectedEl.textContent = data && data.arabic_corrected ? data.arabic_corrected : '—';
-            englishTextEl.textContent = data && data.english ? data.english : '—';
-
-            if (data && data.arabic_audio_url) {
-                arabicAudioLink.href = data.arabic_audio_url;
-                arabicAudioLink.style.display = 'inline-flex';
-            } else {
-                arabicAudioLink.removeAttribute('href');
-                arabicAudioLink.style.display = 'none';
-            }
-
-            if (data && data.english_audio_url) {
-                englishAudioLink.href = data.english_audio_url;
-                englishAudioLink.style.display = 'inline-flex';
-            } else {
-                englishAudioLink.removeAttribute('href');
-                englishAudioLink.style.display = 'none';
-            }
-        }
-
-        async function handleTranslate() {
-            const text = input.value.trim();
-            if (!text) {
-                statusEl.textContent = 'Please enter some Arabizi text.';
-                statusEl.classList.add('error');
-                return;
-            }
-
-            toggleLoading(true);
-            console.log('Sending to:', `${API_BASE}/translate`);
-
-            try {
-                const response = await fetch(`${API_BASE}/translate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
-                });
-
-                console.log('Response status:', response.status);
-
-                if (!response.ok) {
-                    const errText = await response.text();
-                    console.error('Server error response body:', errText);
-                    statusEl.textContent = 'Server error while translating.';
-                    statusEl.classList.add('error');
-                    return;
-                }
-
-                const data = await response.json();
-                console.log('Parsed JSON:', data);
-
-                renderResults(data);
-                statusEl.textContent = 'Translation complete.';
-            } catch (error) {
-                console.error('Fetch error:', error);
-                statusEl.textContent = 'Unable to reach the translator server. Is Flask running on 127.0.0.1:5000?';
-                statusEl.classList.add('error');
-            } finally {
-                toggleLoading(false);
-            }
-        }
-
-        translateBtn.addEventListener('click', handleTranslate);
-
-        demoBtn.addEventListener('click', () => {
-            input.value = sample;
-            handleTranslate();
-        });
-    </script>
+    btn.addEventListener("click", translateText);
+  </script>
 </body>
 </html>
