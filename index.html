@@ -598,15 +598,15 @@
                 </article>
             </div>
 
-            <!-- INLINE AUDIO PLAYERS -->
+            <!-- INLINE AUDIO PLAYERS (ALWAYS VISIBLE) -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
-                    <audio id="arabicAudio" controls style="display:none;"></audio>
+                    <audio id="arabicAudio" controls></audio>
                 </div>
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in English</div>
-                    <audio id="englishAudio" controls style="display:none;"></audio>
+                    <audio id="englishAudio" controls></audio>
                 </div>
             </div>
 
@@ -624,12 +624,7 @@
         <!-- FOOTER -->
         <footer class="footer">
             <p>
-                Made by Saad and 
-                <a href="https://youtu.be/bOd7a8NxiNA?t=8"
-                   target="_blank"
-                   style="color:#555; text-decoration:none; font-weight:600;">
-                    Sari
-                </a>
+                Made by Saad and Sari
             </p>
             <p class="footer-contact">
                 Contact: <span id="contactDetails">add your email / Instagram / phone here</span>
@@ -655,15 +650,10 @@
         const startBtn = document.getElementById('startBtn');
 
         const sample = "sabah el kheir ya habibi! ana t3ban shwy bs ok.";
-      
         const history = [];
+
+        // Use your Render backend
         const API_BASE = "https://ezarabizi.onrender.com";
-  // store last translations
-
-        // API base (local or deployed)
-        // API base – use your Render backend
-        
-
 
         function toggleLoading(isLoading) {
             translateBtn.disabled = isLoading;
@@ -707,10 +697,10 @@
                     ? data.arabic_audio_url
                     : `${API_BASE}${data.arabic_audio_url}`;
                 arabicAudioEl.src = url;
-                arabicAudioEl.style.display = 'block';
+                arabicAudioEl.load();
             } else {
                 arabicAudioEl.removeAttribute('src');
-                arabicAudioEl.style.display = 'none';
+                arabicAudioEl.load();
             }
 
             // English audio
@@ -719,10 +709,10 @@
                     ? data.english_audio_url
                     : `${API_BASE}${data.english_audio_url}`;
                 englishAudioEl.src = url;
-                englishAudioEl.style.display = 'block';
+                englishAudioEl.load();
             } else {
                 englishAudioEl.removeAttribute('src');
-                englishAudioEl.style.display = 'none';
+                englishAudioEl.load();
             }
 
             // Update history (keep last 5)
