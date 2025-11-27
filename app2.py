@@ -27,14 +27,6 @@ AUDIO_DIR = "audio"
 os.makedirs(AUDIO_DIR, exist_ok=True)
 
 # -------------------------------------------------
-# NEW: SERVE index.html
-# -------------------------------------------------
-
-@app.route("/")
-def serve_index():
-    return send_from_directory(".", "index.html")
-
-# -------------------------------------------------
 # ARABIZI RULES
 # -------------------------------------------------
 
@@ -91,6 +83,9 @@ ARABIZI_SPECIAL_WORDS = {
 
 
 def translate_arabizi(text: str) -> str:
+    """
+    Arabizi -> Arabic transliteration with some rules.
+    """
     result = text.lower()
 
     # 1) Multi-letter patterns first
@@ -129,6 +124,9 @@ def translate_arabizi(text: str) -> str:
 
 
 def smart_correct_arabic(text: str) -> str:
+    """
+    Small word-level corrections.
+    """
     word_map = {
         "انا": "أنا",
         "سوري": "آسف",
@@ -144,6 +142,10 @@ def smart_correct_arabic(text: str) -> str:
 
 @app.route("/translate", methods=["POST"])
 def translate_endpoint():
+    """
+    JSON in:
+      { "text": "7abibi keif 7alk" }
+    """
     data = request.get_json()
     print("🔹 /translate called. Raw data:", data)
 
@@ -153,9 +155,11 @@ def translate_endpoint():
     arabizi_text = data["text"]
     print("🔹 Received text:", repr(arabizi_text))
 
+    # Step 1: Arabizi -> rough Arabic
     arabic_raw = translate_arabizi(arabizi_text)
     print("🔹 arabic_raw:", arabic_raw)
 
+    # Step 2: Smart correction
     arabic_corrected = smart_correct_arabic(arabic_raw)
     print("🔹 arabic_corrected:", arabic_corrected)
 
@@ -169,6 +173,7 @@ def translate_endpoint():
 
     print("🔹 english_text:", english_text)
 
+    # Step 4: Audio
     arabic_audio_url = None
     english_audio_url = None
 
@@ -210,9 +215,7 @@ def ping():
     return jsonify({"message": "Server is working"})
 
 
-# -------------------------------------------------
-# RUN (ignored on Render)
-# -------------------------------------------------
-
 if __name__ == "__main__":
+    # 🔹 Important: match this with the API_BASE in your HTML
     app.run(host="127.0.0.1", port=5000, debug=True)
+
