@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EzArabizi · Smart Arabizi Translator</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
     <style>
         :root {
             color-scheme: light dark;
@@ -20,7 +20,7 @@
 
         * {
             box-sizing: border-box;
-            font-family: 'Poppins', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             margin: 0;
             padding: 0;
         }
@@ -42,7 +42,6 @@
             position: relative;
         }
 
-        /* floating background glow behind the app */
         body::before,
         body::after {
             content: "";
@@ -85,7 +84,7 @@
             position: absolute;
             inset: -2px;
             border-radius: inherit;
-            background: linear-gradient(120deg, rgba(255,95,109,0.5), rgba(255,195,113,0.4));
+            background: linear-gradient(120deg, rgba(255, 95, 109, 0.5), rgba(255, 195, 113, 0.4));
             z-index: -1;
             opacity: 0.7;
         }
@@ -95,7 +94,7 @@
             position: absolute;
             inset: 2px;
             border-radius: inherit;
-            background: radial-gradient(circle at top left, rgba(255,255,255,0.9), rgba(255,255,255,0.95));
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.95));
             z-index: -1;
         }
 
@@ -134,7 +133,7 @@
             color: #fff;
             font-weight: 700;
             font-size: 1.3rem;
-            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
         }
 
         h1 {
@@ -174,7 +173,7 @@
 
         .elder-toggle {
             border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.15);
+            border: 1px solid rgba(0, 0, 0, 0.15);
             padding: 0.4rem 0.9rem;
             background: #fff;
             font-size: 0.85rem;
@@ -195,8 +194,8 @@
             font-size: 0.75rem;
             padding: 0.2rem 0.65rem;
             border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(255,255,255,0.85);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            background: rgba(255, 255, 255, 0.85);
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
@@ -220,7 +219,8 @@
             letter-spacing: 0.08em;
         }
 
-        textarea, .output {
+        textarea,
+        .output {
             width: 100%;
             border: none;
             border-radius: 18px;
@@ -256,13 +256,17 @@
             justify-content: center;
             text-align: right;
             direction: rtl;
-            font-family: 'Arial', 'Tahoma', 'Arabic Typesetting', 'Segoe UI', sans-serif;
+            font-family: "Arial", "Tahoma", "Arabic Typesetting", "Segoe UI", sans-serif;
             font-size: 1.5rem;
             line-height: 1.8;
             white-space: pre-wrap;
             word-wrap: break-word;
             border: 1px solid rgba(0, 0, 0, 0.1);
             position: relative;
+        }
+
+        .output span.text {
+            width: 100%;
         }
 
         .controls {
@@ -292,13 +296,14 @@
         }
 
         @keyframes pulseSoft {
-            0%, 100% {
+            0%,
+            100% {
                 transform: translateY(0);
-                box-shadow: 0 10px 24px rgba(255,95,109,0.35);
+                box-shadow: 0 10px 24px rgba(255, 95, 109, 0.35);
             }
             50% {
                 transform: translateY(-1px);
-                box-shadow: 0 14px 32px rgba(255,95,109,0.45);
+                box-shadow: 0 14px 32px rgba(255, 95, 109, 0.45);
             }
         }
 
@@ -338,8 +343,8 @@
             left: 10px;
             font-size: 0.75rem;
             border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.15);
-            background: rgba(255,255,255,0.9);
+            border: 1px solid rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.9);
             padding: 0.15rem 0.6rem;
             cursor: pointer;
         }
@@ -378,12 +383,11 @@
             color: #c0392b;
         }
 
-        /* History styles */
         .history-card {
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             border-radius: 24px;
             padding: 1.5rem;
-            border: 1px solid rgba(0,0,0,0.05);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
         .history-card h2 {
@@ -405,7 +409,7 @@
             padding: 0.7rem 0.9rem;
             border-radius: 14px;
             background: #f8f8f8;
-            border: 1px solid rgba(0,0,0,0.06);
+            border: 1px solid rgba(0, 0, 0, 0.06);
             font-size: 0.9rem;
         }
 
@@ -424,7 +428,6 @@
             margin-top: 0.1rem;
         }
 
-        /* Elder mode */
         body.elder-mode {
             background: #f2f2f2;
         }
@@ -441,13 +444,12 @@
             font-size: 1.05rem;
         }
 
-        /* Footer */
         .footer {
             margin-top: 0.5rem;
             text-align: center;
             font-size: 0.9rem;
             color: #555;
-            border-top: 1px solid rgba(0,0,0,0.08);
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
             padding-top: 0.5rem;
         }
 
@@ -476,7 +478,6 @@
             }
         }
 
-        /* WELCOME OVERLAY */
         .welcome-overlay {
             position: fixed;
             inset: 0;
@@ -491,10 +492,10 @@
         .welcome-inner {
             max-width: 480px;
             width: 90%;
-            background: rgba(255,255,255,0.95);
+            background: rgba(255, 255, 255, 0.95);
             border-radius: 24px;
             padding: 2rem 2.2rem;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
             text-align: center;
         }
 
@@ -523,7 +524,7 @@
 
         .welcome-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
         }
 
         .welcome-overlay.hidden {
@@ -579,21 +580,23 @@
                     <h3>Arabic (Raw)</h3>
                     <div id="arabicRaw" class="output">
                         <button class="copy-btn" data-target="arabicRaw">Copy</button>
-                        Start typing to see the translation.
+                        <span id="arabicRawText" class="text">
+                            Start typing to see the translation.
+                        </span>
                     </div>
                 </article>
                 <article>
                     <h3>Arabic (Corrected)</h3>
                     <div id="arabicCorrected" class="output">
                         <button class="copy-btn" data-target="arabicCorrected">Copy</button>
-                        —
+                        <span id="arabicCorrectedText" class="text">—</span>
                     </div>
                 </article>
                 <article>
                     <h3>English</h3>
-                    <div id="englishText" class="output" dir="ltr" style="text-align:left;">
+                    <div id="englishText" class="output" dir="ltr" style="text-align: left;">
                         <button class="copy-btn" data-target="englishText">Copy</button>
-                        —
+                        <span id="englishTextInner" class="text">—</span>
                     </div>
                 </article>
             </div>
@@ -617,61 +620,63 @@
         <section class="history-card">
             <h2>Recent Translations</h2>
             <div id="historyList" class="history-list">
-                <p style="font-size:0.9rem;color:#6b6b6b;">Your last translations will appear here.</p>
+                <p style="font-size: 0.9rem; color: #6b6b6b;">
+                    Your last translations will appear here.
+                </p>
             </div>
         </section>
 
         <!-- FOOTER -->
         <footer class="footer">
-            <p>
-                Made by Saad and Sari
-            </p>
+            <p>Made by Saad and Sari</p>
             <p class="footer-contact">
-                Contact: <span id="contactDetails">add your email / Instagram / phone here</span>
+                Contact:
+                <span id="contactDetails">add your email / Instagram / phone here</span>
             </p>
         </footer>
     </main>
 
     <script>
-        const input = document.getElementById('inputText');
-        const translateBtn = document.getElementById('translateBtn');
-        const demoBtn = document.getElementById('demoFill');
-        const arabicRawEl = document.getElementById('arabicRaw');
-        const arabicCorrectedEl = document.getElementById('arabicCorrected');
-        const englishTextEl = document.getElementById('englishText');
-        const arabicAudioEl = document.getElementById('arabicAudio');
-        const englishAudioEl = document.getElementById('englishAudio');
-        const statusEl = document.getElementById('status');
-        const elderToggleBtn = document.getElementById('elderToggle');
-        const historyListEl = document.getElementById('historyList');
-        const charCounterEl = document.getElementById('charCounter');
+        const input = document.getElementById("inputText");
+        const translateBtn = document.getElementById("translateBtn");
+        const demoBtn = document.getElementById("demoFill");
+        const arabicRawTextEl = document.getElementById("arabicRawText");
+        const arabicCorrectedTextEl = document.getElementById("arabicCorrectedText");
+        const englishTextInnerEl = document.getElementById("englishTextInner");
+        const arabicAudioEl = document.getElementById("arabicAudio");
+        const englishAudioEl = document.getElementById("englishAudio");
+        const statusEl = document.getElementById("status");
+        const elderToggleBtn = document.getElementById("elderToggle");
+        const historyListEl = document.getElementById("historyList");
+        const charCounterEl = document.getElementById("charCounter");
 
-        const welcomeOverlay = document.getElementById('welcomeOverlay');
-        const startBtn = document.getElementById('startBtn');
+        const welcomeOverlay = document.getElementById("welcomeOverlay");
+        const startBtn = document.getElementById("startBtn");
 
         const sample = "sabah el kheir ya habibi! ana t3ban shwy bs ok.";
         const history = [];
 
-        // Use your Render backend
+        // Your backend on Render
         const API_BASE = "https://ezarabizi.onrender.com";
 
         function toggleLoading(isLoading) {
             translateBtn.disabled = isLoading;
-            translateBtn.textContent = isLoading ? 'Translating…' : 'Translate';
-            statusEl.textContent = isLoading ? 'Generating translation and audio…' : 'Ready.';
-            statusEl.classList.toggle('error', false);
+            translateBtn.textContent = isLoading ? "Translating…" : "Translate";
+            statusEl.textContent = isLoading ? "Generating translation and audio…" : "Ready.";
+            statusEl.classList.remove("error");
         }
 
         function renderHistory() {
             if (history.length === 0) {
-                historyListEl.innerHTML = '<p style="font-size:0.9rem;color:#6b6b6b;">Your last translations will appear here.</p>';
+                historyListEl.innerHTML =
+                    '<p style="font-size:0.9rem;color:#6b6b6b;">Your last translations will appear here.</p>';
                 return;
             }
 
             historyListEl.innerHTML = "";
-            history.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'history-item';
+            history.forEach((item) => {
+                const div = document.createElement("div");
+                div.className = "history-item";
                 div.innerHTML = `
                     <div class="history-arabizi"><strong>Arabizi:</strong> ${item.input}</div>
                     <div class="history-arabic">${item.arabic}</div>
@@ -682,36 +687,38 @@
         }
 
         function renderResults(data, originalInput) {
-            const raw = data?.arabic_raw || '—';
-            const corrected = data?.arabic_corrected || raw || '—';
-            const english = data?.english || '—';
+            // Support simple backend: { "translation": "..." }
+            const fallbackArabic = data?.translation || "—";
 
-            // overwrite the text content (keeping the copy button)
-            arabicRawEl.childNodes[arabicRawEl.childNodes.length - 1].textContent = raw;
-            arabicCorrectedEl.childNodes[arabicCorrectedEl.childNodes.length - 1].textContent = corrected;
-            englishTextEl.childNodes[englishTextEl.childNodes.length - 1].textContent = english;
+            const raw = data?.arabic_raw || fallbackArabic || "—";
+            const corrected = data?.arabic_corrected || raw || "—";
+            const english = data?.english || "—";
+
+            arabicRawTextEl.textContent = raw;
+            arabicCorrectedTextEl.textContent = corrected;
+            englishTextInnerEl.textContent = english;
 
             // Arabic audio
             if (data?.arabic_audio_url) {
-                const url = data.arabic_audio_url.startsWith('http')
+                const url = data.arabic_audio_url.startsWith("http")
                     ? data.arabic_audio_url
                     : `${API_BASE}${data.arabic_audio_url}`;
                 arabicAudioEl.src = url;
                 arabicAudioEl.load();
             } else {
-                arabicAudioEl.removeAttribute('src');
+                arabicAudioEl.removeAttribute("src");
                 arabicAudioEl.load();
             }
 
             // English audio
             if (data?.english_audio_url) {
-                const url = data.english_audio_url.startsWith('http')
+                const url = data.english_audio_url.startsWith("http")
                     ? data.english_audio_url
                     : `${API_BASE}${data.english_audio_url}`;
                 englishAudioEl.src = url;
                 englishAudioEl.load();
             } else {
-                englishAudioEl.removeAttribute('src');
+                englishAudioEl.removeAttribute("src");
                 englishAudioEl.load();
             }
 
@@ -719,7 +726,7 @@
             history.unshift({
                 input: originalInput,
                 arabic: corrected,
-                english: english
+                english: english,
             });
             if (history.length > 5) history.pop();
             renderHistory();
@@ -728,82 +735,84 @@
         async function handleTranslate() {
             const text = input.value.trim();
             if (!text) {
-                statusEl.textContent = 'Please enter some Arabizi text.';
-                statusEl.classList.add('error');
+                statusEl.textContent = "Please enter some Arabizi text.";
+                statusEl.classList.add("error");
                 return;
             }
 
             toggleLoading(true);
             try {
                 const response = await fetch(`${API_BASE}/translate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text })
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text }),
                 });
 
                 if (!response.ok) {
-                    throw new Error('Translation request failed.');
+                    throw new Error("Translation request failed.");
                 }
 
                 const data = await response.json();
                 renderResults(data, text);
-                statusEl.textContent = 'Translation complete.';
+                statusEl.textContent = "Translation complete.";
             } catch (error) {
                 console.error(error);
-                statusEl.textContent = 'Unable to reach the translator server. Is Flask running and API_BASE correct?';
-                statusEl.classList.add('error');
+                statusEl.textContent =
+                    "Unable to reach the translator server. Is Flask running and API_BASE correct?";
+                statusEl.classList.add("error");
             } finally {
                 toggleLoading(false);
             }
         }
 
         // Copy buttons
-        document.addEventListener('click', async (e) => {
-            if (e.target.matches('.copy-btn')) {
-                const targetId = e.target.getAttribute('data-target');
-                const el = document.getElementById(targetId);
-                if (!el) return;
+        document.addEventListener("click", async (e) => {
+            if (e.target.matches(".copy-btn")) {
+                const targetId = e.target.getAttribute("data-target");
+                let text = "";
+                if (targetId === "arabicRaw") text = arabicRawTextEl.textContent.trim();
+                if (targetId === "arabicCorrected") text = arabicCorrectedTextEl.textContent.trim();
+                if (targetId === "englishText") text = englishTextInnerEl.textContent.trim();
 
-                const text = el.textContent.replace('Copy', '').trim();
                 try {
                     await navigator.clipboard.writeText(text);
                     const original = e.target.textContent;
-                    e.target.textContent = 'Copied!';
+                    e.target.textContent = "Copied!";
                     setTimeout(() => {
                         e.target.textContent = original;
                     }, 1000);
                 } catch {
-                    alert('Unable to copy text.');
+                    alert("Unable to copy text.");
                 }
             }
         });
 
         // Elder mode toggle
-        elderToggleBtn.addEventListener('click', () => {
-            document.body.classList.toggle('elder-mode');
-            elderToggleBtn.textContent = document.body.classList.contains('elder-mode')
-                ? '👵 Elder Mode: ON'
-                : '👵 Elder Mode';
+        elderToggleBtn.addEventListener("click", () => {
+            document.body.classList.toggle("elder-mode");
+            elderToggleBtn.textContent = document.body.classList.contains("elder-mode")
+                ? "👵 Elder Mode: ON"
+                : "👵 Elder Mode";
         });
 
         // Welcome screen logic
-        startBtn.addEventListener('click', () => {
-            welcomeOverlay.classList.add('hidden');
+        startBtn.addEventListener("click", () => {
+            welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
-                welcomeOverlay.style.display = 'none';
-                const translatorSection = document.getElementById('translator');
-                translatorSection.scrollIntoView({ behavior: 'smooth' });
+                welcomeOverlay.style.display = "none";
+                const translatorSection = document.getElementById("translator");
+                translatorSection.scrollIntoView({ behavior: "smooth" });
             }, 300);
         });
 
         // Character counter
-        input.addEventListener('input', () => {
+        input.addEventListener("input", () => {
             const len = input.value.length;
-            charCounterEl.textContent = `${len} character${len === 1 ? '' : 's'}`;
+            charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
         });
 
-        translateBtn.addEventListener('click', handleTranslate);
-        demoBtn.addEventListener('click', () => {
+        translateBtn.addEventListener("click", handleTranslate);
+        demoBtn.addEventListener("click", () => {
             input.value = sample;
             charCounterEl.textContent = `${sample.length} characters`;
             handleTranslate();
