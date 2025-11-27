@@ -133,7 +133,7 @@
             color: #fff;
             font-weight: 700;
             font-size: 1.3rem;
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.25);
         }
 
         h1 {
@@ -168,12 +168,12 @@
 
         .cta:hover {
             transform: translateY(-2px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
         }
 
         .elder-toggle {
             border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(0,0,0,0.15);
             padding: 0.4rem 0.9rem;
             background: #fff;
             font-size: 0.85rem;
@@ -194,8 +194,8 @@
             font-size: 0.75rem;
             padding: 0.2rem 0.65rem;
             border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.08);
-            background: rgba(255, 255, 255, 0.85);
+            border: 1px solid rgba(0,0,0,0.08);
+            background: rgba(255,255,255,0.85);
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
@@ -296,14 +296,13 @@
         }
 
         @keyframes pulseSoft {
-            0%,
-            100% {
+            0%, 100% {
                 transform: translateY(0);
-                box-shadow: 0 10px 24px rgba(255, 95, 109, 0.35);
+                box-shadow: 0 10px 24px rgba(255,95,109,0.35);
             }
             50% {
                 transform: translateY(-1px);
-                box-shadow: 0 14px 32px rgba(255, 95, 109, 0.45);
+                box-shadow: 0 14px 32px rgba(255,95,109,0.45);
             }
         }
 
@@ -343,8 +342,8 @@
             left: 10px;
             font-size: 0.75rem;
             border-radius: 999px;
-            border: 1px solid rgba(0, 0, 0, 0.15);
-            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0,0,0,0.15);
+            background: rgba(255,255,255,0.9);
             padding: 0.15rem 0.6rem;
             cursor: pointer;
         }
@@ -384,10 +383,10 @@
         }
 
         .history-card {
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255,255,255,0.9);
             border-radius: 24px;
             padding: 1.5rem;
-            border: 1px solid rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .history-card h2 {
@@ -409,7 +408,7 @@
             padding: 0.7rem 0.9rem;
             border-radius: 14px;
             background: #f8f8f8;
-            border: 1px solid rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(0,0,0,0.06);
             font-size: 0.9rem;
         }
 
@@ -449,7 +448,7 @@
             text-align: center;
             font-size: 0.9rem;
             color: #555;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            border-top: 1px solid rgba(0,0,0,0.08);
             padding-top: 0.5rem;
         }
 
@@ -492,10 +491,10 @@
         .welcome-inner {
             max-width: 480px;
             width: 90%;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(255,255,255,0.95);
             border-radius: 24px;
             padding: 2rem 2.2rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.25);
             text-align: center;
         }
 
@@ -524,7 +523,7 @@
 
         .welcome-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.18);
         }
 
         .welcome-overlay.hidden {
@@ -539,7 +538,7 @@
         <div class="welcome-inner">
             <h2 class="welcome-title">Welcome to EzArabizi</h2>
             <p class="welcome-text">
-                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily.
+                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English — with audio they can listen to easily.
             </p>
             <button id="startBtn" class="welcome-btn">Start Translating</button>
         </div>
@@ -552,6 +551,11 @@
                 <div>
                     <h1>EzArabizi</h1>
                     <p>Translate Arabizi chats into beautiful Arabic script in one tap.</p>
+                    <div class="feature-chips">
+                        <span class="chip">🔊 Audio for elders</span>
+                        <span class="chip">🧓 Elder-friendly mode</span>
+                        <span class="chip">🤖 Smart correction</span>
+                    </div>
                 </div>
             </div>
             <div class="header-actions">
@@ -563,7 +567,7 @@
         <section id="translator" class="translator-card">
             <div>
                 <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="e.g. '9ba7 al5eir ya 7bibi'"></textarea>
+                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
                 <div id="charCounter" class="char-counter">0 characters</div>
             </div>
             <div class="controls">
@@ -626,7 +630,7 @@
             <p>Made by Saad and Sari</p>
             <p class="footer-contact">
                 Contact:
-                <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
+                <span id="contactDetails">add your email / Instagram / phone here</span>
             </p>
         </footer>
     </main>
@@ -648,6 +652,7 @@
         const welcomeOverlay = document.getElementById("welcomeOverlay");
         const startBtn = document.getElementById("startBtn");
 
+        // Short, safe sample sentence
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
@@ -807,10 +812,12 @@
         });
 
         translateBtn.addEventListener("click", handleTranslate);
+
+        // Try Sample: only fill the text, do NOT auto-translate
         demoBtn.addEventListener("click", () => {
             input.value = sample;
-            charCounterEl.textContent = `${sample.length} characters`;
-            handleTranslate();
+            const len = input.value.length;
+            charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
         });
     </script>
 </body>
