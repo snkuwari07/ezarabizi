@@ -183,25 +183,6 @@
             cursor: pointer;
         }
 
-        .feature-chips {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.45rem;
-            margin-top: 0.5rem;
-        }
-
-        .chip {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.65rem;
-            border-radius: 999px;
-            border: 1px solid rgba(0,0,0,0.08);
-            background: rgba(255,255,255,0.85);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.25rem;
-            color: #555;
-        }
-
         .translator-card {
             background: rgba(255, 255, 255, 0.9);
             border-radius: 24px;
@@ -570,7 +551,7 @@
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- RESULTS: ONLY ONE BOX CALLED "Arabic" -->
+            <!-- TWO BOXES: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -579,6 +560,13 @@
                         <span id="arabicOutputText" class="text">
                             Start typing to see the translation.
                         </span>
+                    </div>
+                </article>
+                <article>
+                    <h3>English</h3>
+                    <div id="englishOutput" class="output" dir="ltr" style="text-align:left; direction:ltr;">
+                        <button class="copy-btn" data-target="englishOutput">Copy</button>
+                        <span id="englishOutputText" class="text">—</span>
                     </div>
                 </article>
             </div>
@@ -622,7 +610,10 @@
         const input = document.getElementById("inputText");
         const translateBtn = document.getElementById("translateBtn");
         const demoBtn = document.getElementById("demoFill");
+
         const arabicOutputTextEl = document.getElementById("arabicOutputText");
+        const englishOutputTextEl = document.getElementById("englishOutputText");
+
         const arabicAudioEl = document.getElementById("arabicAudio");
         const englishAudioEl = document.getElementById("englishAudio");
         const statusEl = document.getElementById("status");
@@ -633,7 +624,6 @@
         const welcomeOverlay = document.getElementById("welcomeOverlay");
         const startBtn = document.getElementById("startBtn");
 
-        // Short, safe sample sentence
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
@@ -668,16 +658,17 @@
         }
 
         function renderResults(data, originalInput) {
-            // Decide which Arabic to show in the single box
+            // Decide which Arabic to show in the single Arabic box
             const arabicFinal =
                 data?.arabic_corrected ||
                 data?.arabic_raw ||
                 data?.translation ||
                 "—";
 
-            const english = data?.english || "—";
+            const englishFinal = data?.english || "—";
 
             arabicOutputTextEl.textContent = arabicFinal;
+            englishOutputTextEl.textContent = englishFinal;
 
             // Arabic audio
             if (data?.arabic_audio_url) {
@@ -707,7 +698,7 @@
             history.unshift({
                 input: originalInput,
                 arabic: arabicFinal,
-                english: english,
+                english: englishFinal,
             });
             if (history.length > 5) history.pop();
             renderHistory();
@@ -746,13 +737,16 @@
             }
         }
 
-        // Copy button (only Arabic box now)
+        // Copy buttons (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
                 let text = "";
                 if (targetId === "arabicOutput") {
                     text = arabicOutputTextEl.textContent.trim();
+                }
+                if (targetId === "englishOutput") {
+                    text = englishOutputTextEl.textContent.trim();
                 }
 
                 try {
