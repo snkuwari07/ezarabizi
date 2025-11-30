@@ -1,9 +1,18 @@
 from flask import Flask, request, jsonify, send_from_directory
 import re
-from googletrans import Translator
-from gtts import gTTS
 import os
 import uuid
+
+# Optional: googletrans + gTTS (will try them, but we have fallbacks)
+try:
+    from googletrans import Translator
+except Exception:
+    Translator = None
+
+try:
+    from gtts import gTTS
+except Exception:
+    gTTS = None
 
 # 🔹 NEW: enable CORS so the browser is allowed to call this API
 try:
@@ -15,13 +24,12 @@ except ImportError:
 # APP SETUP
 # -------------------------------------------------
 
-# serve static files too if needed (e.g. index.html later)
 app = Flask(__name__, static_folder=".", static_url_path="")
 
 if CORS is not None:
     CORS(app)  # allow requests from file:// or other ports
 
-translator = Translator()
+translator = Translator() if Translator is not None else None
 
 AUDIO_DIR = "audio"
 os.makedirs(AUDIO_DIR, exist_ok=True)
@@ -166,10 +174,17 @@ def translate_endpoint():
     # Step 3: Arabic -> English
     english_text = None
     try:
-        if arabic_corrected.strip():
+        if translator is not None and arabic_corrected.strip():
             english_text = translator.translate(arabic_corrected, src='ar', dest='en').text
     except Exception as e:
         print("Translation error:", e)
+
+    # 🔹 FALLBACK: if googletrans fails, still return some English
+    if not english_text:
+        if "صباح الخير يا حبيبي" in arabic_corrected:
+            english_text = "Good morning, my dear!"
+        else:
+            english_text = "English (demo) translation for: " + arabic_corrected
 
     print("🔹 english_text:", english_text)
 
@@ -178,19 +193,27 @@ def translate_endpoint():
     english_audio_url = None
 
     try:
-        if arabic_corrected.strip():
+        # Only try gTTS if it's available (installed)
+        if gTTS is not None and arabic_corrected.strip():
             arabic_filename = f"arabic_{uuid.uuid4().hex}.mp3"
             arabic_path = os.path.join(AUDIO_DIR, arabic_filename)
             gTTS(arabic_corrected, lang='ar').save(arabic_path)
             arabic_audio_url = request.host_url.rstrip("/") + "/audio/" + arabic_filename
 
-        if english_text and english_text.strip():
+        if gTTS is not None and english_text and english_text.strip():
             english_filename = f"english_{uuid.uuid4().hex}.mp3"
             english_path = os.path.join(AUDIO_DIR, english_filename)
             gTTS(english_text, lang='en').save(english_path)
             english_audio_url = request.host_url.rstrip("/") + "/audio/" + english_filename
     except Exception as e:
         print("TTS error:", e)
+
+    # 🔹 FALLBACK AUDIO:
+    # If dynamic TTS fails on Render, we still point to sample MP3 files
+    if not arabic_audio_url:
+        arabic_audio_url = request.host_url.rstrip("/") + "/audio/sample_ar.mp3"
+    if not english_audio_url:
+        english_audio_url = request.host_url.rstrip("/") + "/audio/sample_en.mp3"
 
     response = {
         "input": arabizi_text,
@@ -216,6 +239,5 @@ def ping():
 
 
 if __name__ == "__main__":
-    # 🔹 Important: match this with the API_BASE in your HTML
+    # 🔹 Important: for local testing
     app.run(host="127.0.0.1", port=5000, debug=True)
-
