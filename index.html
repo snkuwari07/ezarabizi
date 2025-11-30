@@ -551,7 +551,6 @@
                 <div>
                     <h1>EzArabizi</h1>
                     <p>Translate Arabizi chats into beautiful Arabic script in one tap.</p>
-                    
                 </div>
             </div>
             <div class="header-actions">
@@ -570,28 +569,16 @@
                 <button class="secondary" id="demoFill">Try Sample</button>
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
+
+            <!-- RESULTS: ONLY ONE BOX CALLED "Arabic" -->
             <div class="results-grid">
                 <article>
-                    <h3>Arabic (Raw)</h3>
-                    <div id="arabicRaw" class="output">
-                        <button class="copy-btn" data-target="arabicRaw">Copy</button>
-                        <span id="arabicRawText" class="text">
+                    <h3>Arabic</h3>
+                    <div id="arabicOutput" class="output">
+                        <button class="copy-btn" data-target="arabicOutput">Copy</button>
+                        <span id="arabicOutputText" class="text">
                             Start typing to see the translation.
                         </span>
-                    </div>
-                </article>
-                <article>
-                    <h3>Arabic (Corrected)</h3>
-                    <div id="arabicCorrected" class="output">
-                        <button class="copy-btn" data-target="arabicCorrected">Copy</button>
-                        <span id="arabicCorrectedText" class="text">—</span>
-                    </div>
-                </article>
-                <article>
-                    <h3>English</h3>
-                    <div id="englishText" class="output" dir="ltr" style="text-align: left;">
-                        <button class="copy-btn" data-target="englishText">Copy</button>
-                        <span id="englishTextInner" class="text">—</span>
                     </div>
                 </article>
             </div>
@@ -635,9 +622,7 @@
         const input = document.getElementById("inputText");
         const translateBtn = document.getElementById("translateBtn");
         const demoBtn = document.getElementById("demoFill");
-        const arabicRawTextEl = document.getElementById("arabicRawText");
-        const arabicCorrectedTextEl = document.getElementById("arabicCorrectedText");
-        const englishTextInnerEl = document.getElementById("englishTextInner");
+        const arabicOutputTextEl = document.getElementById("arabicOutputText");
         const arabicAudioEl = document.getElementById("arabicAudio");
         const englishAudioEl = document.getElementById("englishAudio");
         const statusEl = document.getElementById("status");
@@ -683,16 +668,16 @@
         }
 
         function renderResults(data, originalInput) {
-            // Support simple backend: { "translation": "..." }
-            const fallbackArabic = data?.translation || "—";
+            // Decide which Arabic to show in the single box
+            const arabicFinal =
+                data?.arabic_corrected ||
+                data?.arabic_raw ||
+                data?.translation ||
+                "—";
 
-            const raw = data?.arabic_raw || fallbackArabic || "—";
-            const corrected = data?.arabic_corrected || raw || "—";
             const english = data?.english || "—";
 
-            arabicRawTextEl.textContent = raw;
-            arabicCorrectedTextEl.textContent = corrected;
-            englishTextInnerEl.textContent = english;
+            arabicOutputTextEl.textContent = arabicFinal;
 
             // Arabic audio
             if (data?.arabic_audio_url) {
@@ -721,7 +706,7 @@
             // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
-                arabic: corrected,
+                arabic: arabicFinal,
                 english: english,
             });
             if (history.length > 5) history.pop();
@@ -761,14 +746,14 @@
             }
         }
 
-        // Copy buttons
+        // Copy button (only Arabic box now)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
                 let text = "";
-                if (targetId === "arabicRaw") text = arabicRawTextEl.textContent.trim();
-                if (targetId === "arabicCorrected") text = arabicCorrectedTextEl.textContent.trim();
-                if (targetId === "englishText") text = englishTextInnerEl.textContent.trim();
+                if (targetId === "arabicOutput") {
+                    text = arabicOutputTextEl.textContent.trim();
+                }
 
                 try {
                     await navigator.clipboard.writeText(text);
