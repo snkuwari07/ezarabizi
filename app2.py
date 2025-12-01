@@ -3,36 +3,31 @@ import re
 import os
 import uuid
 
-# Optional: googletrans + gTTS (will try them, but we have fallbacks)
-try:
-    from googletrans import Translator
-except Exception:
-    Translator = None
+# googletrans + gTTS
+from googletrans import Translator
+from gtts import gTTS
 
-try:
-    from gtts import gTTS
-except Exception:
-    gTTS = None
-
-# 🔹 NEW: enable CORS so the browser is allowed to call this API
+# CORS (for your Netlify / Sites frontend)
 try:
     from flask_cors import CORS
 except ImportError:
-    CORS = None  # we'll handle this below
+    CORS = None
 
 # -------------------------------------------------
 # APP SETUP
 # -------------------------------------------------
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+AUDIO_DIR = os.path.join(BASE_DIR, "audio")
+
+os.makedirs(AUDIO_DIR, exist_ok=True)
+
 app = Flask(__name__, static_folder=".", static_url_path="")
 
 if CORS is not None:
-    CORS(app)  # allow requests from file:// or other ports
+    CORS(app)
 
-translator = Translator() if Translator is not None else None
-
-AUDIO_DIR = "audio"
-os.makedirs(AUDIO_DIR, exist_ok=True)
+translator = Translator()
 
 # -------------------------------------------------
 # ARABIZI RULES
@@ -91,9 +86,6 @@ ARABIZI_SPECIAL_WORDS = {
 
 
 def translate_arabizi(text: str) -> str:
-    """
-    Arabizi -> Arabic transliteration with some rules.
-    """
     result = text.lower()
 
     # 1) Multi-letter patterns first
@@ -132,14 +124,10 @@ def translate_arabizi(text: str) -> str:
 
 
 def smart_correct_arabic(text: str) -> str:
-    """
-    Small word-level corrections.
-    """
     word_map = {
         "انا": "أنا",
         "سوري": "آسف",
     }
-
     words = text.split()
     corrected_words = [word_map.get(w, w) for w in words]
     return " ".join(corrected_words)
@@ -174,12 +162,14 @@ def translate_endpoint():
     # Step 3: Arabic -> English
     english_text = None
     try:
-        if translator is not None and arabic_corrected.strip():
-            english_text = translator.translate(arabic_corrected, src='ar', dest='en').text
+        if arabic_corrected.strip():
+            english_text = translator.translate(
+                arabic_corrected, src="ar", dest="en"
+            ).text
     except Exception as e:
         print("Translation error:", e)
 
-    # 🔹 FALLBACK: if googletrans fails, still return some English
+    # simple fallback if googletrans fails
     if not english_text:
         if "صباح الخير يا حبيبي" in arabic_corrected:
             english_text = "Good morning, my dear!"
@@ -188,32 +178,25 @@ def translate_endpoint():
 
     print("🔹 english_text:", english_text)
 
-    # Step 4: Audio
+    # Step 4: Audio with gTTS
     arabic_audio_url = None
     english_audio_url = None
 
     try:
-        # Only try gTTS if it's available (installed)
-        if gTTS is not None and arabic_corrected.strip():
+        if arabic_corrected.strip():
             arabic_filename = f"arabic_{uuid.uuid4().hex}.mp3"
             arabic_path = os.path.join(AUDIO_DIR, arabic_filename)
-            gTTS(arabic_corrected, lang='ar').save(arabic_path)
-            arabic_audio_url = request.host_url.rstrip("/") + "/audio/" + arabic_filename
+            gTTS(arabic_corrected, lang="ar").save(arabic_path)
+            # IMPORTANT: return a RELATIVE url
+            arabic_audio_url = f"/audio/{arabic_filename}"
 
-        if gTTS is not None and english_text and english_text.strip():
+        if english_text and english_text.strip():
             english_filename = f"english_{uuid.uuid4().hex}.mp3"
             english_path = os.path.join(AUDIO_DIR, english_filename)
-            gTTS(english_text, lang='en').save(english_path)
-            english_audio_url = request.host_url.rstrip("/") + "/audio/" + english_filename
+            gTTS(english_text, lang="en").save(english_path)
+            english_audio_url = f"/audio/{english_filename}"
     except Exception as e:
         print("TTS error:", e)
-
-    # 🔹 FALLBACK AUDIO:
-    # If dynamic TTS fails on Render, we still point to sample MP3 files
-    if not arabic_audio_url:
-        arabic_audio_url = request.host_url.rstrip("/") + "/audio/sample_ar.mp3"
-    if not english_audio_url:
-        english_audio_url = request.host_url.rstrip("/") + "/audio/sample_en.mp3"
 
     response = {
         "input": arabizi_text,
@@ -221,7 +204,7 @@ def translate_endpoint():
         "arabic_corrected": arabic_corrected,
         "english": english_text,
         "arabic_audio_url": arabic_audio_url,
-        "english_audio_url": english_audio_url
+        "english_audio_url": english_audio_url,
     }
 
     print("🔹 Response JSON:", response)
@@ -230,6 +213,7 @@ def translate_endpoint():
 
 @app.route("/audio/<path:filename>", methods=["GET"])
 def get_audio(filename):
+    # serves files from the /audio folder
     return send_from_directory(AUDIO_DIR, filename)
 
 
@@ -239,6 +223,5 @@ def ping():
 
 
 if __name__ == "__main__":
-    # 🔹 Important: for local testing
     app.run(host="127.0.0.1", port=5000, debug=True)
 
