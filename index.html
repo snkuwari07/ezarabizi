@@ -551,7 +551,7 @@
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- TWO BOXES: ARABIC + ENGLISH -->
+            <!-- RESULTS: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -571,7 +571,7 @@
                 </article>
             </div>
 
-            <!-- INLINE AUDIO PLAYERS (ALWAYS VISIBLE) -->
+            <!-- AUDIO PLAYERS -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
@@ -628,7 +628,7 @@
         const history = [];
 
         // 🌐 BACKEND URL
-        // PUBLIC (for submission):
+        // PUBLIC (submission):
         const API_BASE = "https://ezarabizi.onrender.com";
         // LOCAL (for class demo), change to:
         // const API_BASE = "http://127.0.0.1:5000";
@@ -679,6 +679,9 @@
                     : `${API_BASE}${data.arabic_audio_url}`;
                 arabicAudioEl.src = url;
                 arabicAudioEl.load();
+                arabicAudioEl.play().catch(() => {
+                    console.log("Arabic audio ready but browser blocked auto-play.");
+                });
             } else {
                 arabicAudioEl.removeAttribute("src");
                 arabicAudioEl.load();
@@ -691,6 +694,9 @@
                     : `${API_BASE}${data.english_audio_url}`;
                 englishAudioEl.src = url;
                 englishAudioEl.load();
+                englishAudioEl.play().catch(() => {
+                    console.log("English audio ready but browser blocked auto-play.");
+                });
             } else {
                 englishAudioEl.removeAttribute("src");
                 englishAudioEl.load();
