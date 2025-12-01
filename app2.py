@@ -6,7 +6,7 @@ import uuid
 # -------------------------------------------------
 # External libraries
 # -------------------------------------------------
-from googletrans import Translator        # make sure version is 4.0.0-rc1
+from googletrans import Translator        # Make sure version is 4.0.0-rc1
 from gtts import gTTS
 
 try:
@@ -27,7 +27,7 @@ app = Flask(__name__)
 if CORS is not None:
     CORS(app)
 
-# use a stable Google endpoint
+# Use Google's stable endpoint (required for Render)
 translator = Translator(service_urls=["translate.googleapis.com"])
 
 # -------------------------------------------------
@@ -122,13 +122,14 @@ def translate_arabizi(text: str) -> str:
     return " ".join(translated_words)
 
 def smart_correct_arabic(text: str) -> str:
+    """Small fixes for common Arabic mistakes."""
     word_map = {
         "انا": "أنا",
         "سوري": "آسف",
     }
     words = text.split()
-    corrected_words = [word_map.get(w, w) for w in words]
-    return " ".join(corrected_words)
+    corrected = [word_map.get(w, w) for w in words]
+    return " ".join(corrected)
 
 # -------------------------------------------------
 # ROUTES
@@ -147,47 +148,44 @@ def translate_endpoint():
     if not arabizi_text:
         return jsonify({"error": "Missing 'text'"}), 400
 
-    print("🔹 Received text:", repr(arabizi_text))
+    print("🔹 Received:", arabizi_text)
 
-    # 1) Arabizi -> Arabic
+    # 1) Arabizi → Arabic
     arabic_raw = translate_arabizi(arabizi_text)
     arabic_corrected = smart_correct_arabic(arabic_raw)
+
     print("🔹 arabic_raw:", arabic_raw)
     print("🔹 arabic_corrected:", arabic_corrected)
 
-    # 2) Arabic -> English (Google Translate)
-    english_text = ""
+    # 2) Arabic → English (REAL googletrans)
     try:
-        if arabic_corrected:
-            result = translator.translate(arabic_corrected, src="ar", dest="en")
-            english_text = result.text
+        english_text = translator.translate(
+            arabic_corrected, src="ar", dest="en"
+        ).text
     except Exception as e:
         print("Translation error:", repr(e))
-        english_text = ""
-
-    # If Google fails, show a clear message instead of Arabic again
-    if not english_text:
-        english_text = "[Translation not available]"
+        english_text = arabic_corrected   # fallback
 
     print("🔹 english_text:", english_text)
 
-    # 3) Audio with gTTS
+    # 3) Generate audio (gTTS)
     arabic_audio_url = None
     english_audio_url = None
+
     try:
         if arabic_corrected:
-            arabic_filename = f"arabic_{uuid.uuid4().hex}.mp3"
-            arabic_path = os.path.join(AUDIO_DIR, arabic_filename)
-            gTTS(arabic_corrected, lang="ar").save(arabic_path)
-            arabic_audio_url = f"/audio/{arabic_filename}"
+            ar_filename = f"arabic_{uuid.uuid4().hex}.mp3"
+            ar_path = os.path.join(AUDIO_DIR, ar_filename)
+            gTTS(arabic_corrected, lang="ar").save(ar_path)
+            arabic_audio_url = f"/audio/{ar_filename}"
 
-        if english_text and english_text != "[Translation not available]":
-            english_filename = f"english_{uuid.uuid4().hex}.mp3"
-            english_path = os.path.join(AUDIO_DIR, english_filename)
-            gTTS(english_text, lang="en").save(english_path)
-            english_audio_url = f"/audio/{english_filename}"
+        if english_text:
+            en_filename = f"english_{uuid.uuid4().hex}.mp3"
+            en_path = os.path.join(AUDIO_DIR, en_filename)
+            gTTS(english_text, lang="en").save(en_path)
+            english_audio_url = f"/audio/{en_filename}"
+
     except Exception as e:
-        # if TTS fails on Render, just log it; frontend will still have text
         print("TTS error:", repr(e))
 
     response = {
@@ -198,6 +196,7 @@ def translate_endpoint():
         "arabic_audio_url": arabic_audio_url,
         "english_audio_url": english_audio_url,
     }
+
     print("🔹 Response JSON:", response)
     return jsonify(response)
 
