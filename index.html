@@ -101,7 +101,7 @@
         @keyframes floatIn {
             from {
                 opacity: 0;
-            transform: translateY(20px) scale(0.98);
+                transform: translateY(20px) scale(0.98);
             }
             to {
                 opacity: 1;
@@ -443,13 +443,16 @@
             .app-shell {
                 border-radius: 20px;
             }
+
             header {
                 flex-direction: column;
                 align-items: flex-start;
             }
+
             .header-actions {
                 align-items: flex-start;
             }
+
             .controls {
                 flex-direction: column;
             }
@@ -510,7 +513,6 @@
         }
     </style>
 </head>
-
 <body>
     <!-- WELCOME PAGE OVERLAY -->
     <div id="welcomeOverlay" class="welcome-overlay">
@@ -544,13 +546,12 @@
                 <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
                 <div id="charCounter" class="char-counter">0 characters</div>
             </div>
-
             <div class="controls">
                 <button class="secondary" id="demoFill">Try Sample</button>
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- RESULTS -->
+            <!-- TWO BOXES: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -570,7 +571,7 @@
                 </article>
             </div>
 
-            <!-- AUDIO -->
+            <!-- INLINE AUDIO PLAYERS (ALWAYS VISIBLE) -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
@@ -626,10 +627,10 @@
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
-        // For PUBLIC site (Render):
+        // 🌐 BACKEND URL
+        // PUBLIC (for submission):
         const API_BASE = "https://ezarabizi.onrender.com";
-
-        // For LOCAL testing, temporarily change to:
+        // LOCAL (for class demo), change to:
         // const API_BASE = "http://127.0.0.1:5000";
 
         function toggleLoading(isLoading) {
@@ -730,7 +731,7 @@
             } catch (error) {
                 console.error(error);
                 statusEl.textContent =
-                    "Unable to reach the translator server. Is Flask running and API_BASE correct?";
+                    "Unable to reach the translator server. Please try again later.";
                 statusEl.classList.add("error");
             } finally {
                 toggleLoading(false);
@@ -762,7 +763,6 @@
             }
         });
 
-        // Elder mode
         elderToggleBtn.addEventListener("click", () => {
             document.body.classList.toggle("elder-mode");
             elderToggleBtn.textContent = document.body.classList.contains("elder-mode")
@@ -770,16 +770,15 @@
                 : "👵 Elder Mode";
         });
 
-        // Welcome overlay
         startBtn.addEventListener("click", () => {
             welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
                 welcomeOverlay.style.display = "none";
-                document.getElementById("translator").scrollIntoView({ behavior: "smooth" });
+                const translatorSection = document.getElementById("translator");
+                translatorSection.scrollIntoView({ behavior: "smooth" });
             }, 300);
         });
 
-        // Character counter
         input.addEventListener("input", () => {
             const len = input.value.length;
             charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
