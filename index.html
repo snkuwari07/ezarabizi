@@ -515,15 +515,18 @@
 </head>
 <body>
     <!-- WELCOME PAGE OVERLAY -->
-    <div id="welcomeOverlay" class="welcome-overlay">
-        <div class="welcome-inner">
-            <h2 class="welcome-title">Welcome to EzArabizi</h2>
-            <p class="welcome-text" style="text-align: left;">
-                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
-            </p>
-            <button id="startBtn" class="welcome-btn">Start Translating</button>
-        </div>
+<div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-inner">
+        <h2 class="welcome-title">Welcome to EzArabizi</h2>
+
+        <p class="welcome-text" style="text-align: left;">
+            EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
+        </p>
+
+        <button id="startBtn" class="welcome-btn">Start Translating</button>
     </div>
+</div>
+
 
     <main class="app-shell">
         <header>
@@ -551,7 +554,7 @@
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- RESULTS: ARABIC + ENGLISH -->
+            <!-- TWO BOXES: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -571,7 +574,7 @@
                 </article>
             </div>
 
-            <!-- AUDIO PLAYERS -->
+            <!-- INLINE AUDIO PLAYERS (ALWAYS VISIBLE) -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
@@ -601,7 +604,7 @@
             <p>Made by Saad and Sari</p>
             <p class="footer-contact">
                 Contact:
-                <span id="contactDetails">snkuwari@andrew.cmu.edu / sabulrub@andrew.cmu.edu</span>
+                <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
             </p>
         </footer>
     </main>
@@ -627,12 +630,9 @@
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
-        // BACKEND URL: local vs public
-        const API_BASE =
-            window.location.hostname === "localhost" ||
-            window.location.hostname === "127.0.0.1"
-                ? "http://127.0.0.1:5000"
-                : "https://ezarabizi.onrender.com";
+        // Your backend on Render
+        const API_BASE = "https://ezarabizi.onrender.com";
+
 
         function toggleLoading(isLoading) {
             translateBtn.disabled = isLoading;
@@ -662,13 +662,14 @@
         }
 
         function renderResults(data, originalInput) {
+            // Decide which Arabic to show in the single Arabic box
             const arabicFinal =
                 data?.arabic_corrected ||
                 data?.arabic_raw ||
                 data?.translation ||
                 "—";
 
-            const englishFinal = data?.english || "English translation unavailable.";
+            const englishFinal = data?.english || "—";
 
             arabicOutputTextEl.textContent = arabicFinal;
             englishOutputTextEl.textContent = englishFinal;
@@ -697,6 +698,7 @@
                 englishAudioEl.load();
             }
 
+            // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
                 arabic: arabicFinal,
@@ -732,14 +734,14 @@
             } catch (error) {
                 console.error(error);
                 statusEl.textContent =
-                    "Unable to reach the translator server. Is the API running?";
+                    "Unable to reach the translator server. Is Flask running and API_BASE correct?";
                 statusEl.classList.add("error");
             } finally {
                 toggleLoading(false);
             }
         }
 
-        // Copy buttons
+        // Copy buttons (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
@@ -772,7 +774,7 @@
                 : "👵 Elder Mode";
         });
 
-        // Welcome overlay
+        // Welcome screen logic
         startBtn.addEventListener("click", () => {
             welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
@@ -790,7 +792,7 @@
 
         translateBtn.addEventListener("click", handleTranslate);
 
-        // Sample fill
+        // Try Sample: only fill the text, do NOT auto-translate
         demoBtn.addEventListener("click", () => {
             input.value = sample;
             const len = input.value.length;
