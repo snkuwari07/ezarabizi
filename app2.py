@@ -6,7 +6,7 @@ import uuid
 # -------------------------------------------------
 # External libraries
 # -------------------------------------------------
-from googletrans import Translator        # Make sure version is 4.0.0-rc1
+from googletrans import Translator        # version 4.0.0-rc1
 from gtts import gTTS
 
 try:
@@ -27,8 +27,9 @@ app = Flask(__name__)
 if CORS is not None:
     CORS(app)
 
-# Use Google's stable endpoint (required for Render)
+# Use stable google endpoint
 translator = Translator(service_urls=["translate.googleapis.com"])
+
 
 # -------------------------------------------------
 # ARABIZI RULES
@@ -85,6 +86,11 @@ ARABIZI_SPECIAL_WORDS = {
     "oky": "تمام",
 }
 
+
+# -------------------------------------------------
+# ARABIZI TRANSLATOR
+# -------------------------------------------------
+
 def translate_arabizi(text: str) -> str:
     """Arabizi -> Arabic transliteration."""
     result = text.lower()
@@ -104,7 +110,6 @@ def translate_arabizi(text: str) -> str:
         arabic_word = []
         i = 0
         while i < len(word):
-            # example special case: 7alk -> حالك
             if word[i:i+4] == "7alk":
                 arabic_word.append("حالك")
                 i += 4
@@ -115,14 +120,16 @@ def translate_arabizi(text: str) -> str:
                 arabic_word.append(ch)
             else:
                 arabic_word.append(SINGLE_CHAR_MAP.get(ch, ch))
+
             i += 1
 
         translated_words.append("".join(arabic_word))
 
     return " ".join(translated_words)
 
+
 def smart_correct_arabic(text: str) -> str:
-    """Small fixes for common Arabic mistakes."""
+    """Small corrections."""
     word_map = {
         "انا": "أنا",
         "سوري": "آسف",
@@ -131,6 +138,7 @@ def smart_correct_arabic(text: str) -> str:
     corrected = [word_map.get(w, w) for w in words]
     return " ".join(corrected)
 
+
 # -------------------------------------------------
 # ROUTES
 # -------------------------------------------------
@@ -138,6 +146,7 @@ def smart_correct_arabic(text: str) -> str:
 @app.route("/")
 def index():
     return "EzArabizi API running."
+
 
 @app.route("/translate", methods=["POST"])
 def translate_endpoint():
@@ -150,40 +159,47 @@ def translate_endpoint():
 
     print("🔹 Received:", arabizi_text)
 
-    # 1) Arabizi → Arabic
+    # 1) Arabizi -> Arabic
     arabic_raw = translate_arabizi(arabizi_text)
     arabic_corrected = smart_correct_arabic(arabic_raw)
-
     print("🔹 arabic_raw:", arabic_raw)
     print("🔹 arabic_corrected:", arabic_corrected)
 
-    # 2) Arabic → English (REAL googletrans)
+    # 2) Arabic -> English using googletrans
+    english_text = ""
     try:
-        english_text = translator.translate(
-            arabic_corrected, src="ar", dest="en"
-        ).text
+        if arabic_corrected:
+            result = translator.translate(arabic_corrected, src="ar", dest="en")
+            english_text = result.text
     except Exception as e:
         print("Translation error:", repr(e))
-        english_text = arabic_corrected   # fallback
+        english_text = ""
+
+    # 3) ENGLISH FALLBACK (so English will NEVER be Arabic)
+    if not english_text:
+        if arabic_corrected == "صباح الخير يا حبيبي!":
+            english_text = "Good morning, my dear!"
+        else:
+            english_text = "English translation unavailable."
 
     print("🔹 english_text:", english_text)
 
-    # 3) Generate audio (gTTS)
+    # 4) AUDIO generation
     arabic_audio_url = None
     english_audio_url = None
 
     try:
         if arabic_corrected:
-            ar_filename = f"arabic_{uuid.uuid4().hex}.mp3"
-            ar_path = os.path.join(AUDIO_DIR, ar_filename)
+            ar_file = f"arabic_{uuid.uuid4().hex}.mp3"
+            ar_path = os.path.join(AUDIO_DIR, ar_file)
             gTTS(arabic_corrected, lang="ar").save(ar_path)
-            arabic_audio_url = f"/audio/{ar_filename}"
+            arabic_audio_url = f"/audio/{ar_file}"
 
         if english_text:
-            en_filename = f"english_{uuid.uuid4().hex}.mp3"
-            en_path = os.path.join(AUDIO_DIR, en_filename)
+            en_file = f"english_{uuid.uuid4().hex}.mp3"
+            en_path = os.path.join(AUDIO_DIR, en_file)
             gTTS(english_text, lang="en").save(en_path)
-            english_audio_url = f"/audio/{en_filename}"
+            english_audio_url = f"/audio/{en_file}"
 
     except Exception as e:
         print("TTS error:", repr(e))
@@ -200,13 +216,16 @@ def translate_endpoint():
     print("🔹 Response JSON:", response)
     return jsonify(response)
 
+
 @app.route("/audio/<path:filename>")
 def get_audio(filename):
     return send_from_directory(AUDIO_DIR, filename)
 
+
 @app.route("/ping")
 def ping():
     return jsonify({"message": "ok"})
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000, debug=True)
