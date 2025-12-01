@@ -627,11 +627,12 @@
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
-        // 🌐 BACKEND URL
-        // PUBLIC (submission):
-        const API_BASE = "https://ezarabizi.onrender.com";
-        // LOCAL (for class demo), change to:
-        // const API_BASE = "http://127.0.0.1:5000";
+        // BACKEND URL: local vs public
+        const API_BASE =
+            window.location.hostname === "localhost" ||
+            window.location.hostname === "127.0.0.1"
+                ? "http://127.0.0.1:5000"
+                : "https://ezarabizi.onrender.com";
 
         function toggleLoading(isLoading) {
             translateBtn.disabled = isLoading;
@@ -667,7 +668,7 @@
                 data?.translation ||
                 "—";
 
-            const englishFinal = data?.english || "—";
+            const englishFinal = data?.english || "English translation unavailable.";
 
             arabicOutputTextEl.textContent = arabicFinal;
             englishOutputTextEl.textContent = englishFinal;
@@ -679,9 +680,6 @@
                     : `${API_BASE}${data.arabic_audio_url}`;
                 arabicAudioEl.src = url;
                 arabicAudioEl.load();
-                arabicAudioEl.play().catch(() => {
-                    console.log("Arabic audio ready but browser blocked auto-play.");
-                });
             } else {
                 arabicAudioEl.removeAttribute("src");
                 arabicAudioEl.load();
@@ -694,9 +692,6 @@
                     : `${API_BASE}${data.english_audio_url}`;
                 englishAudioEl.src = url;
                 englishAudioEl.load();
-                englishAudioEl.play().catch(() => {
-                    console.log("English audio ready but browser blocked auto-play.");
-                });
             } else {
                 englishAudioEl.removeAttribute("src");
                 englishAudioEl.load();
@@ -737,7 +732,7 @@
             } catch (error) {
                 console.error(error);
                 statusEl.textContent =
-                    "Unable to reach the translator server. Please try again later.";
+                    "Unable to reach the translator server. Is the API running?";
                 statusEl.classList.add("error");
             } finally {
                 toggleLoading(false);
@@ -769,6 +764,7 @@
             }
         });
 
+        // Elder mode toggle
         elderToggleBtn.addEventListener("click", () => {
             document.body.classList.toggle("elder-mode");
             elderToggleBtn.textContent = document.body.classList.contains("elder-mode")
@@ -776,6 +772,7 @@
                 : "👵 Elder Mode";
         });
 
+        // Welcome overlay
         startBtn.addEventListener("click", () => {
             welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
@@ -785,6 +782,7 @@
             }, 300);
         });
 
+        // Character counter
         input.addEventListener("input", () => {
             const len = input.value.length;
             charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
@@ -792,6 +790,7 @@
 
         translateBtn.addEventListener("click", handleTranslate);
 
+        // Sample fill
         demoBtn.addEventListener("click", () => {
             input.value = sample;
             const len = input.value.length;
