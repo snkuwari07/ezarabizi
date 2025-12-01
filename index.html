@@ -246,13 +246,6 @@
             position: relative;
         }
 
-        #englishOutput {
-            direction: ltr;
-            text-align: left;
-            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            font-size: 1.1rem;
-        }
-
         .output span.text {
             width: 100%;
         }
@@ -522,15 +515,18 @@
 </head>
 <body>
     <!-- WELCOME PAGE OVERLAY -->
-    <div id="welcomeOverlay" class="welcome-overlay">
-        <div class="welcome-inner">
-            <h2 class="welcome-title">Welcome to EzArabizi</h2>
-            <p class="welcome-text">
-                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily.
-            </p>
-            <button id="startBtn" class="welcome-btn">Start Translating</button>
-        </div>
+<div id="welcomeOverlay" class="welcome-overlay">
+    <div class="welcome-inner">
+        <h2 class="welcome-title">Welcome to EzArabizi</h2>
+
+        <p class="welcome-text" style="text-align: left;">
+            EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
+        </p>
+
+        <button id="startBtn" class="welcome-btn">Start Translating</button>
     </div>
+</div>
+
 
     <main class="app-shell">
         <header>
@@ -538,7 +534,7 @@
                 <div class="logo-badge">Ez</div>
                 <div>
                     <h1>EzArabizi</h1>
-                    <p>Translate Arabizi chats into clear Arabic and English with audio.</p>
+                    <p>Enter your Arabizi message and press Translate.</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -550,7 +546,7 @@
         <section id="translator" class="translator-card">
             <div>
                 <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="Copy–paste an Arabizi message here…"></textarea>
+                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
                 <div id="charCounter" class="char-counter">0 characters</div>
             </div>
             <div class="controls">
@@ -571,7 +567,7 @@
                 </article>
                 <article>
                     <h3>English</h3>
-                    <div id="englishOutput" class="output">
+                    <div id="englishOutput" class="output" dir="ltr" style="text-align:left; direction:ltr;">
                         <button class="copy-btn" data-target="englishOutput">Copy</button>
                         <span id="englishOutputText" class="text">—</span>
                     </div>
@@ -608,7 +604,7 @@
             <p>Made by Saad and Sari</p>
             <p class="footer-contact">
                 Contact:
-                <span id="contactDetails">snkuwari@andrew.cmu.edu / sabulrub@andrew.cmu.edu</span>
+                <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
             </p>
         </footer>
     </main>
@@ -664,65 +660,24 @@
             });
         }
 
-        function firstNonEmpty(...vals) {
-            for (const v of vals) {
-                if (v !== undefined && v !== null && String(v).trim() !== "") {
-                    return v;
-                }
-            }
-            return "";
-        }
-
         function renderResults(data, originalInput) {
-            console.log("Response from /translate:", data);
+            // Decide which Arabic to show in the single Arabic box
+            const arabicFinal =
+                data?.arabic_corrected ||
+                data?.arabic_raw ||
+                data?.translation ||
+                "—";
 
-            // Arabic text – try several keys, including nested ones
-            const arabicFinal = firstNonEmpty(
-                data.arabic_corrected,
-                data.arabic_raw,
-                data.arabic,
-                data.translation_ar,
-                data.translation,
-                data.arabic_output,
-                data?.translations?.arabic
-            ) || "—";
-
-            // English text – try multiple possibilities
-            let englishFinal = firstNonEmpty(
-                data.english,
-                data.english_corrected,
-                data.english_raw,
-                data.translation_en,
-                data.english_translation,
-                data.english_output,
-                data.en,
-                data?.translations?.english
-            );
-
-            if (!englishFinal) {
-                englishFinal = "—";
-                statusEl.textContent = "Arabic translated. No English field found in server response.";
-            } else {
-                statusEl.textContent = "Translation complete.";
-            }
+            const englishFinal = data?.english || "—";
 
             arabicOutputTextEl.textContent = arabicFinal;
             englishOutputTextEl.textContent = englishFinal;
 
-            // Arabic audio URL – check several keys
-            const arabicAudioUrl = firstNonEmpty(
-                data.arabic_audio_url,
-                data.arabic_tts_url,
-                data.audio_arabic,
-                data.arabic_audio,
-                data.arabic_voice_url,
-                data?.audio?.arabic
-            );
-
-            if (arabicAudioUrl) {
-                const url = arabicAudioUrl.startsWith("http")
-                    ? arabicAudioUrl
-                    : `${API_BASE}${arabicAudioUrl}`;
+            // Arabic audio
+            if (data?.arabic_audio_url) {
+                const url = data.arabic_audio_url.startsWith("http")
+                    ? data.arabic_audio_url
+                    : `${API_BASE}${data.arabic_audio_url}`;
                 arabicAudioEl.src = url;
                 arabicAudioEl.load();
             } else {
@@ -730,30 +685,16 @@
                 arabicAudioEl.load();
             }
 
-            // English audio URL – check several keys
-            const englishAudioUrl = firstNonEmpty(
-                data.english_audio_url,
-                data.english_tts_url,
-                data.audio_english,
-                data.english_audio,
-                data.english_voice_url,
-                data?.audio?.english
-            );
-
-            if (englishAudioUrl) {
-                const url = englishAudioUrl.startsWith("http")
-                    ? englishAudioUrl
-                    : `${API_BASE}${englishAudioUrl}`;
+            // English audio
+            if (data?.english_audio_url) {
+                const url = data.english_audio_url.startsWith("http")
+                    ? data.english_audio_url
+                    : `${API_BASE}${data.english_audio_url}`;
                 englishAudioEl.src = url;
                 englishAudioEl.load();
             } else {
                 englishAudioEl.removeAttribute("src");
                 englishAudioEl.load();
-            }
-
-            // If no audio at all, mention it
-            if (!arabicAudioUrl && !englishAudioUrl) {
-                statusEl.textContent += " (No audio URLs in server response.)";
             }
 
             // Update history (keep last 5)
@@ -783,17 +724,16 @@
                 });
 
                 if (!response.ok) {
-                    const txt = await response.text();
-                    console.error("Non-OK response:", response.status, txt);
                     throw new Error("Translation request failed.");
                 }
 
                 const data = await response.json();
                 renderResults(data, text);
+                statusEl.textContent = "Translation complete.";
             } catch (error) {
                 console.error(error);
                 statusEl.textContent =
-                    "Unable to reach the translator server or parse the response. Is Flask running and API_BASE correct?";
+                    "Unable to reach the translator server. Is Flask running and API_BASE correct?";
                 statusEl.classList.add("error");
             } finally {
                 toggleLoading(false);
