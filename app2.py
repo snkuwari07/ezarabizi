@@ -159,13 +159,15 @@ def translate_endpoint():
     english_text = ""
     try:
         if arabic_corrected:
-            english_text = translator.translate(
-                arabic_corrected, src="ar", dest="en"
-            ).text
+            result = translator.translate(arabic_corrected, src="ar", dest="en")
+            english_text = result.text
     except Exception as e:
         print("Translation error:", repr(e))
-        # if google fails, just fall back to Arabic so it's never empty
-        english_text = arabic_corrected
+        english_text = ""
+
+    # If Google fails, show a clear message instead of Arabic again
+    if not english_text:
+        english_text = "[Translation not available]"
 
     print("🔹 english_text:", english_text)
 
@@ -179,7 +181,7 @@ def translate_endpoint():
             gTTS(arabic_corrected, lang="ar").save(arabic_path)
             arabic_audio_url = f"/audio/{arabic_filename}"
 
-        if english_text:
+        if english_text and english_text != "[Translation not available]":
             english_filename = f"english_{uuid.uuid4().hex}.mp3"
             english_path = os.path.join(AUDIO_DIR, english_filename)
             gTTS(english_text, lang="en").save(english_path)
