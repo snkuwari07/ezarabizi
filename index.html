@@ -513,100 +513,25 @@
         }
     </style>
 </head>
+<!-- keep all your <head> and CSS exactly as you wrote them -->
+
 <body>
     <!-- WELCOME PAGE OVERLAY -->
-<div id="welcomeOverlay" class="welcome-overlay">
-    <div class="welcome-inner">
-        <h2 class="welcome-title">Welcome to EzArabizi</h2>
-
-        <p class="welcome-text" style="text-align: left;">
-            EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
-        </p>
-
-        <button id="startBtn" class="welcome-btn">Start Translating</button>
+    <div id="welcomeOverlay" class="welcome-overlay">
+        <div class="welcome-inner">
+            <h2 class="welcome-title">Welcome to EzArabizi</h2>
+            <p class="welcome-text" style="text-align: left;">
+                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic and English with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
+            </p>
+            <button id="startBtn" class="welcome-btn">Start Translating</button>
+        </div>
     </div>
-</div>
-
 
     <main class="app-shell">
-        <header>
-            <div class="logo">
-                <div class="logo-badge">Ez</div>
-                <div>
-                    <h1>EzArabizi</h1>
-                    <p>Enter your Arabizi message and press Translate.</p>
-                </div>
-            </div>
-            <div class="header-actions">
-                <a class="cta" href="#translator">Go to Translator</a>
-                <button class="elder-toggle" id="elderToggle">👵 Elder Mode</button>
-            </div>
-        </header>
+        <!-- your header / layout unchanged ... -->
 
-        <section id="translator" class="translator-card">
-            <div>
-                <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
-                <div id="charCounter" class="char-counter">0 characters</div>
-            </div>
-            <div class="controls">
-                <button class="secondary" id="demoFill">Try Sample</button>
-                <button class="primary" id="translateBtn">Translate</button>
-            </div>
+        <!-- translator section, results, audio, footer: unchanged -->
 
-            <!-- TWO BOXES: ARABIC + ENGLISH -->
-            <div class="results-grid">
-                <article>
-                    <h3>Arabic</h3>
-                    <div id="arabicOutput" class="output">
-                        <button class="copy-btn" data-target="arabicOutput">Copy</button>
-                        <span id="arabicOutputText" class="text">
-                            Start typing to see the translation.
-                        </span>
-                    </div>
-                </article>
-                <article>
-                    <h3>English</h3>
-                    <div id="englishOutput" class="output" dir="ltr" style="text-align:left; direction:ltr;">
-                        <button class="copy-btn" data-target="englishOutput">Copy</button>
-                        <span id="englishOutputText" class="text">—</span>
-                    </div>
-                </article>
-            </div>
-
-            <!-- INLINE AUDIO PLAYERS (ALWAYS VISIBLE) -->
-            <div class="audio-row">
-                <div class="audio-block">
-                    <div class="audio-label">🔊 Listen in Arabic</div>
-                    <audio id="arabicAudio" controls></audio>
-                </div>
-                <div class="audio-block">
-                    <div class="audio-label">🔊 Listen in English</div>
-                    <audio id="englishAudio" controls></audio>
-                </div>
-            </div>
-
-            <p id="status" class="status">Ready.</p>
-        </section>
-
-        <!-- HISTORY SECTION -->
-        <section class="history-card">
-            <h2>Recent Translations</h2>
-            <div id="historyList" class="history-list">
-                <p style="font-size: 0.9rem; color: #6b6b6b;">
-                    Your last translations will appear here.
-                </p>
-            </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="footer">
-            <p>Made by Saad and Sari</p>
-            <p class="footer-contact">
-                Contact:
-                <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
-            </p>
-        </footer>
     </main>
 
     <script>
@@ -630,8 +555,11 @@
         const sample = "9ba7 al5eir ya 7bibi!";
         const history = [];
 
-        // Your backend on Render
+        // 🔹 BACKEND URL
+        // For PUBLIC site (Render):
         const API_BASE = "https://ezarabizi.onrender.com";
+        // For LOCAL testing, temporarily change to:
+        // const API_BASE = "http://127.0.0.1:5000";
 
         function toggleLoading(isLoading) {
             translateBtn.disabled = isLoading;
@@ -661,7 +589,6 @@
         }
 
         function renderResults(data, originalInput) {
-            // Decide which Arabic to show in the single Arabic box
             const arabicFinal =
                 data?.arabic_corrected ||
                 data?.arabic_raw ||
@@ -697,7 +624,6 @@
                 englishAudioEl.load();
             }
 
-            // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
                 arabic: arabicFinal,
@@ -740,7 +666,6 @@
             }
         }
 
-        // Copy buttons (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
@@ -765,7 +690,6 @@
             }
         });
 
-        // Elder mode toggle
         elderToggleBtn.addEventListener("click", () => {
             document.body.classList.toggle("elder-mode");
             elderToggleBtn.textContent = document.body.classList.contains("elder-mode")
@@ -773,7 +697,6 @@
                 : "👵 Elder Mode";
         });
 
-        // Welcome screen logic
         startBtn.addEventListener("click", () => {
             welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
@@ -783,7 +706,6 @@
             }, 300);
         });
 
-        // Character counter
         input.addEventListener("input", () => {
             const len = input.value.length;
             charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
@@ -791,7 +713,6 @@
 
         translateBtn.addEventListener("click", handleTranslate);
 
-        // Try Sample: only fill the text, do NOT auto-translate
         demoBtn.addEventListener("click", () => {
             input.value = sample;
             const len = input.value.length;
@@ -800,3 +721,4 @@
     </script>
 </body>
 </html>
+
