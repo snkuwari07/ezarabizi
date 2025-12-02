@@ -250,6 +250,14 @@
             width: 100%;
         }
 
+        /* NEW: English output override */
+        .output-en {
+            direction: ltr;
+            text-align: left;
+            font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-size: 1rem;
+        }
+
         .controls {
             display: flex;
             flex-wrap: wrap;
@@ -568,7 +576,7 @@
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- SINGLE BOX: ARABIC ONLY -->
+            <!-- RESULTS: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -579,13 +587,28 @@
                         </span>
                     </div>
                 </article>
+
+                <!-- NEW: English result -->
+                <article>
+                    <h3>English</h3>
+                    <div id="englishOutput" class="output output-en">
+                        <button class="copy-btn" data-target="englishOutput">Copy</button>
+                        <span id="englishOutputText" class="text">
+                            English translation will appear here.
+                        </span>
+                    </div>
+                </article>
             </div>
 
-            <!-- ARABIC AUDIO ONLY -->
+            <!-- AUDIO: ARABIC + ENGLISH -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
                     <audio id="arabicAudio" controls></audio>
+                </div>
+                <div class="audio-block">
+                    <div class="audio-label">🔊 Listen in English</div>
+                    <audio id="englishAudio" controls></audio>
                 </div>
             </div>
 
@@ -650,8 +673,11 @@
         const demoBtn = document.getElementById("demoFill");
 
         const arabicOutputTextEl = document.getElementById("arabicOutputText");
+        const englishOutputTextEl = document.getElementById("englishOutputText");
 
         const arabicAudioEl = document.getElementById("arabicAudio");
+        const englishAudioEl = document.getElementById("englishAudio");
+
         const statusEl = document.getElementById("status");
         const elderToggleBtn = document.getElementById("elderToggle");
         const historyListEl = document.getElementById("historyList");
@@ -714,6 +740,22 @@
                 arabicAudioEl.load();
             }
 
+            // NEW: English text
+            const englishFinal = data?.english || "";
+            englishOutputTextEl.textContent = englishFinal || "English translation will appear here.";
+
+            // NEW: English audio
+            if (data?.english_audio_url) {
+                const eurl = data.english_audio_url.startsWith("http")
+                    ? data.english_audio_url
+                    : `${API_BASE}${data.english_audio_url}`;
+                englishAudioEl.src = eurl;
+                englishAudioEl.load();
+            } else {
+                englishAudioEl.removeAttribute("src");
+                englishAudioEl.load();
+            }
+
             // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
@@ -756,13 +798,15 @@
             }
         }
 
-        // Copy button (Arabic only)
+        // Copy button (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
                 let text = "";
                 if (targetId === "arabicOutput") {
                     text = arabicOutputTextEl.textContent.trim();
+                } else if (targetId === "englishOutput") {
+                    text = englishOutputTextEl.textContent.trim();
                 }
 
                 try {
