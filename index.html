@@ -434,6 +434,24 @@
             color: #333;
         }
 
+        /* NEW: Learn section styling */
+        .footer-learning {
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #444;
+            text-align: left;
+        }
+
+        .footer-learning h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .footer-learning ul {
+            list-style: disc;
+            padding-left: 1.2rem;
+        }
+
         @media (max-width: 640px) {
             .app-shell {
                 border-radius: 20px;
@@ -534,6 +552,8 @@
             <div class="header-actions">
                 <a class="cta" href="#translator">Go to Translator</a>
                 <button class="elder-toggle" id="elderToggle">👵 Elder Mode</button>
+                <!-- NEW: button that jumps to learning list -->
+                <button class="elder-toggle" id="learnSectionBtn">📚 Learn Arabizi</button>
             </div>
         </header>
 
@@ -589,6 +609,18 @@
                 Contact:
                 <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
             </p>
+
+            <!-- NEW: Learn section under Contact -->
+            <div id="learnSectionFooter" class="footer-learning">
+                <h3>Learn Arabizi – How to use EzArabizi</h3>
+                <ul>
+                    <li>Copy any Arabizi message from your chat.</li>
+                    <li>Paste it in the box above and press <strong>Translate</strong>.</li>
+                    <li>Listen to the Arabic audio to practice reading and pronunciation.</li>
+                    <li>Compare your Arabizi spelling with the Arabic sentence to learn patterns.</li>
+                    <li>Repeat with more messages to get used to common Arabizi letters and numbers.</li>
+                </ul>
+            </div>
         </footer>
     </main>
 
@@ -758,6 +790,16 @@
             const len = input.value.length;
             charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
         });
+
+        // NEW: scroll to Learn section when clicking top-right button
+        const learnSectionBtn = document.getElementById("learnSectionBtn");
+        const learnSectionFooter = document.getElementById("learnSectionFooter");
+
+        if (learnSectionBtn && learnSectionFooter) {
+            learnSectionBtn.addEventListener("click", () => {
+                learnSectionFooter.scrollIntoView({ behavior: "smooth" });
+            });
+        }
     </script>
 </body>
 </html>
