@@ -1,125 +1,226 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+from flask import Flask, request, jsonify, send_from_directory
+import re
+import os
+import uuid
 
-app = Flask(__name__, static_folder="static")
-CORS(app)
+# googletrans + gTTS
+from googletrans import Translator
+from gtts import gTTS
 
+# CORS (for your Netlify / Sites frontend)
+try:
+    from flask_cors import CORS
+except ImportError:
+    CORS = None
 
-def normalize(text: str) -> str:
-    # Lowercase + remove extra spaces
-    return " ".join(text.strip().lower().split())
+# -------------------------------------------------
+# APP SETUP
+# -------------------------------------------------
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+AUDIO_DIR = os.path.join(BASE_DIR, "audio")
 
-PHRASES = {
-    # ----- Your phrases -----
-    "salam 3lykm": {
-        "arabic": "السلام عليكم",
-        "english": "Peace be upon you",
-        "arabic_audio": "/static/audio/salam_3lykm_ar.mp3",
-        "english_audio": "/static/audio/salam_3lykm_en.mp3",
-    },
-    "kif 7alk": {
-        "arabic": "كيف حالك؟",
-        "english": "How are you?",
-        "arabic_audio": "/static/audio/kif_7alk_ar.mp3",
-        "english_audio": "/static/audio/kif_7alk_en.mp3",
-    },
-    "ana b5eir": {
-        "arabic": "أنا بخير",
-        "english": "I'm fine",
-        "arabic_audio": "/static/audio/ana_b5eir_ar.mp3",
-        "english_audio": "/static/audio/ana_b5eir_en.mp3",
-    },
-    "ana t3ban": {
-        "arabic": "أنا تعبان",
-        "english": "I'm tired",
-        "arabic_audio": "/static/audio/ana_t3ban_ar.mp3",
-        "english_audio": "/static/audio/ana_t3ban_en.mp3",
-    },
-    "9ba7 al5eir": {
-        "arabic": "صباح الخير",
-        "english": "Good morning",
-        "arabic_audio": "/static/audio/9ba7_al5eir_ar.mp3",
-        "english_audio": "/static/audio/9ba7_al5eir_en.mp3",
-    },
-    "m3 alslamh": {
-        "arabic": "مع السلامة",
-        "english": "Goodbye",
-        "arabic_audio": "/static/audio/m3_alslamh_ar.mp3",
-        "english_audio": "/static/audio/m3_alslamh_en.mp3",
-    },
+os.makedirs(AUDIO_DIR, exist_ok=True)
 
-    # ----- Extra phrases -----
-    "msa2 al5eir": {
-        "arabic": "مساء الخير",
-        "english": "Good evening",
-        "arabic_audio": "/static/audio/msa2_al5eir_ar.mp3",
-        "english_audio": "/static/audio/msa2_al5eir_en.mp3",
-    },
-    "t9b7 3la 5eir": {
-        "arabic": "تصبح على خير",
-        "english": "Good night",
-        "arabic_audio": "/static/audio/t9b7_3la_5eir_ar.mp3",
-        "english_audio": "/static/audio/t9b7_3la_5eir_en.mp3",
-    },
-    "shukran": {
-        "arabic": "شكرًا",
-        "english": "Thank you",
-        "arabic_audio": "/static/audio/shukran_ar.mp3",
-        "english_audio": "/static/audio/shukran_en.mp3",
-    },
-    "afwan": {
-        "arabic": "عفوًا",
-        "english": "You're welcome",
-        "arabic_audio": "/static/audio/afwan_ar.mp3",
-        "english_audio": "/static/audio/afwan_en.mp3",
-    },
-    "la t7aty": {
-        "arabic": "لا تحاتي",
-        "english": "Don't worry",
-        "arabic_audio": "/static/audio/la_t7aty_ar.mp3",
-        "english_audio": "/static/audio/la_t7aty_en.mp3",
-    },
-    "waink": {
-        "arabic": "وينك؟",
-        "english": "Where are you?",
-        "arabic_audio": "/static/audio/waink_ar.mp3",
-        "english_audio": "/static/audio/waink_en.mp3",
-    },
+app = Flask(__name__, static_folder=".", static_url_path="")
+
+if CORS is not None:
+    CORS(app)
+
+translator = Translator()
+
+# -------------------------------------------------
+# ARABIZI RULES
+# -------------------------------------------------
+
+MULTI_CHAR_RULES = [
+    ("kh", "خ"),
+    ("gh", "غ"),
+    ("sh", "ش"),
+    ("ch", "تش"),
+    ("th", "ث"),
+    ("dh", "ذ"),
+    ("ei", "ي"),
+    ("ee", "ي"),
+]
+
+SINGLE_CHAR_MAP = {
+    "a": "ا",
+    "b": "ب",
+    "t": "ت",
+    "j": "ج",
+    "h": "ه",
+    "7": "ح",
+    "5": "خ",
+    "d": "د",
+    "r": "ر",
+    "z": "ز",
+    "s": "س",
+    "9": "ص",
+    "6": "ط",
+    "3": "ع",
+    "f": "ف",
+    "q": "ق",
+    "8": "ق",
+    "k": "ك",
+    "l": "ل",
+    "m": "م",
+    "n": "ن",
+    "w": "و",
+    "o": "و",
+    "y": "ي",
+    "e": "ي",
+    "i": "ي",
+    "u": "و",
+    "2": "ء",
+    "4": "ذ",
+}
+
+ARABIZI_SPECIAL_WORDS = {
+    "7abibi": "حبيبي",
+    "7abeby": "حبيبي",
+    "ok": "تمام",
+    "okay": "تمام",
+    "oky": "تمام",
 }
 
 
+def translate_arabizi(text: str) -> str:
+    result = text.lower()
+
+    # 1) Multi-letter patterns first
+    for pattern, repl in MULTI_CHAR_RULES:
+        result = re.sub(pattern, repl, result)
+
+    translated_words = []
+    words = result.split()
+
+    for word in words:
+        if word in ARABIZI_SPECIAL_WORDS:
+            translated_words.append(ARABIZI_SPECIAL_WORDS[word])
+            continue
+
+        arabic_word = []
+        i = 0
+        while i < len(word):
+            # special substring: 7alk -> حالك
+            if word[i:i+4] == "7alk":
+                arabic_word.append("حالك")
+                i += 4
+                continue
+
+            ch = word[i]
+
+            if '\u0600' <= ch <= '\u06FF':
+                arabic_word.append(ch)
+            else:
+                arabic_word.append(SINGLE_CHAR_MAP.get(ch, ch))
+
+            i += 1
+
+        translated_words.append("".join(arabic_word))
+
+    return " ".join(translated_words)
+
+
+def smart_correct_arabic(text: str) -> str:
+    word_map = {
+        "انا": "أنا",
+        "سوري": "آسف",
+    }
+    words = text.split()
+    corrected_words = [word_map.get(w, w) for w in words]
+    return " ".join(corrected_words)
+
+# -------------------------------------------------
+# API ROUTES
+# -------------------------------------------------
+
 @app.route("/translate", methods=["POST"])
-def translate():
-    data = request.get_json() or {}
-    original_text = data.get("text", "")
+def translate_endpoint():
+    """
+    JSON in:
+      { "text": "7abibi keif 7alk" }
+    """
+    data = request.get_json()
+    print("🔹 /translate called. Raw data:", data)
 
-    if not original_text.strip():
-        return jsonify({"error": "No text provided"}), 400
+    if not data or "text" not in data:
+        return jsonify({"error": "Missing 'text'"}), 400
 
-    key = normalize(original_text)
-    phrase = PHRASES.get(key)
+    arabizi_text = data["text"]
+    print("🔹 Received text:", repr(arabizi_text))
 
-    if not phrase:
-        msg_ar = "عذرًا، هذه الجملة غير موجودة في القاموس حتى الآن."
-        return jsonify({
-            "arabic_raw": msg_ar,
-            "arabic_corrected": msg_ar,
-            "translation": msg_ar,
-            "english": "English translation unavailable.",
-            "arabic_audio_url": None,
-            "english_audio_url": None,
-        })
+    # Step 1: Arabizi -> rough Arabic
+    arabic_raw = translate_arabizi(arabizi_text)
+    print("🔹 arabic_raw:", arabic_raw)
 
-    return jsonify({
-        "arabic_raw": phrase["arabic"],
-        "arabic_corrected": phrase["arabic"],
-        "translation": phrase["arabic"],
-        "english": phrase["english"],
-        "arabic_audio_url": phrase.get("arabic_audio"),
-        "english_audio_url": phrase.get("english_audio"),
-    })
+    # Step 2: Smart correction
+    arabic_corrected = smart_correct_arabic(arabic_raw)
+    print("🔹 arabic_corrected:", arabic_corrected)
+
+    # Step 3: Arabic -> English
+    english_text = None
+    try:
+        if arabic_corrected.strip():
+            english_text = translator.translate(
+                arabic_corrected, src="ar", dest="en"
+            ).text
+    except Exception as e:
+        print("Translation error:", e)
+
+    # simple fallback if googletrans fails
+    if not english_text:
+        if "صباح الخير يا حبيبي" in arabic_corrected:
+            english_text = "Good morning, my dear!"
+        else:
+            english_text = "English (demo) translation for: " + arabic_corrected
+
+    print("🔹 english_text:", english_text)
+
+    # Step 4: Audio with gTTS
+    arabic_audio_url = None
+    english_audio_url = None
+
+    try:
+        if arabic_corrected.strip():
+            arabic_filename = f"arabic_{uuid.uuid4().hex}.mp3"
+            arabic_path = os.path.join(AUDIO_DIR, arabic_filename)
+            gTTS(arabic_corrected, lang="ar").save(arabic_path)
+            # IMPORTANT: return a RELATIVE url
+            arabic_audio_url = f"/audio/{arabic_filename}"
+
+        if english_text and english_text.strip():
+            english_filename = f"english_{uuid.uuid4().hex}.mp3"
+            english_path = os.path.join(AUDIO_DIR, english_filename)
+            gTTS(english_text, lang="en").save(english_path)
+            english_audio_url = f"/audio/{english_filename}"
+    except Exception as e:
+        print("TTS error:", e)
+
+    response = {
+        "input": arabizi_text,
+        "arabic_raw": arabic_raw,
+        "arabic_corrected": arabic_corrected,
+        "english": english_text,
+        "arabic_audio_url": arabic_audio_url,
+        "english_audio_url": english_audio_url,
+    }
+
+    print("🔹 Response JSON:", response)
+    return jsonify(response)
+
+
+@app.route("/audio/<path:filename>", methods=["GET"])
+def get_audio(filename):
+    # serves files from the /audio folder
+    return send_from_directory(AUDIO_DIR, filename)
+
+
+@app.route("/ping", methods=["GET"])
+def ping():
+    return jsonify({"message": "Server is working"})
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+    app.run(host="127.0.0.1", port=5000, debug=True)
