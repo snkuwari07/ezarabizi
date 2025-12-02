@@ -2,9 +2,7 @@ from flask import Flask, request, jsonify, send_from_directory
 import re
 import os
 import uuid
-import requests  # NEW: for calling LibreTranslate
-
-# gTTS for audio
+import requests  # for calling the translation API
 from gtts import gTTS
 
 # CORS (for your Netlify / Sites frontend)
@@ -109,7 +107,7 @@ def translate_arabizi(text: str) -> str:
 
             ch = word[i]
 
-            if '\u0600' <= ch <= '\u06FF':
+            if "\u0600" <= ch <= "\u06FF":
                 arabic_word.append(ch)
             else:
                 arabic_word.append(SINGLE_CHAR_MAP.get(ch, ch))
@@ -132,29 +130,30 @@ def smart_correct_arabic(text: str) -> str:
 
 
 # -------------------------------------------------
-# NEW: Arabic → English using LibreTranslate
+# ARABIC → ENGLISH USING LIBRETRANSLATE / ARGOS
 # -------------------------------------------------
 
-def translate_to_english(arabic_text: str) -> str | None:
+def translate_to_english(arabic_text: str):
     """
-    Uses LibreTranslate public API to translate Arabic -> English.
+    Uses a public LibreTranslate/Argos instance to translate Arabic -> English.
     Returns the English text, or None if something goes wrong.
     """
     if not arabic_text.strip():
         return None
 
     try:
-        # Public instance of LibreTranslate (good for demos / class projects)
-        url = "https://libretranslate.de/translate"
+        # Public instance (good enough for class/demo use)
+        url = "https://translate.argosopentech.com/translate"
 
         resp = requests.post(
             url,
-            data={
+            json={
                 "q": arabic_text,
                 "source": "ar",
                 "target": "en",
                 "format": "text",
             },
+            headers={"Accept": "application/json"},
             timeout=8,
         )
 
@@ -197,14 +196,14 @@ def translate_endpoint():
     arabic_corrected = smart_correct_arabic(arabic_raw)
     print("🔹 arabic_corrected:", arabic_corrected)
 
-    # Step 3: Arabic -> English (via LibreTranslate)
+    # Step 3: Arabic -> English
     english_text = None
     try:
         english_text = translate_to_english(arabic_corrected)
     except Exception as e:
         print("Translation wrapper error:", e)
 
-    # simple fallback if translation API fails
+    # Fallback if external translation fails
     if not english_text:
         if "صباح الخير يا حبيبي" in arabic_corrected:
             english_text = "Good morning, my dear!"
@@ -257,4 +256,5 @@ def ping():
 
 
 if __name__ == "__main__":
+    # Local dev
     app.run(host="127.0.0.1", port=5000, debug=True)
