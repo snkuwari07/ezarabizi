@@ -511,21 +511,6 @@
             opacity: 0;
             pointer-events: none;
         }
-
-        .phrase-hints {
-            margin-top: 0.75rem;
-            font-size: 0.85rem;
-            color: #555;
-        }
-
-        .phrase-hints ul {
-            margin-top: 0.35rem;
-            padding-left: 1rem;
-        }
-
-        .phrase-hints li {
-            margin-bottom: 0.15rem;
-        }
     </style>
 </head>
 <body>
@@ -534,7 +519,7 @@
         <div class="welcome-inner">
             <h2 class="welcome-title">Welcome to EzArabizi</h2>
             <p class="welcome-text">
-                EzArabizi helps elders and families understand common Arabizi phrases by turning them into clear Arabic and English, with audio in both languages. It makes sure elders never feel left out of conversations with the younger generation.
+                EzArabizi helps elders and families understand common Arabizi phrases by turning them into clear Arabic and English, with audio in both languages.
             </p>
             <button id="startBtn" class="welcome-btn">Start Translating</button>
         </div>
@@ -560,24 +545,6 @@
                 <label for="inputText">Arabizi Input</label>
                 <textarea id="inputText" placeholder="Try: Salam 3lykm"></textarea>
                 <div id="charCounter" class="char-counter">0 characters</div>
-
-                <div class="phrase-hints">
-                    <strong>Common phrases you can try:</strong>
-                    <ul>
-                        <li>Salam 3lykm → السلام عليكم / Peace be upon you</li>
-                        <li>Kif 7alk → كيف حالك؟ / How are you?</li>
-                        <li>Ana b5eir → أنا بخير / I'm fine</li>
-                        <li>Ana t3ban → أنا تعبان / I'm tired</li>
-                        <li>9ba7 al5eir → صباح الخير / Good morning</li>
-                        <li>m3 alslamh → مع السلامة / Goodbye</li>
-                        <li>msa2 al5eir → مساء الخير / Good evening</li>
-                        <li>t9b7 3la 5eir → تصبح على خير / Good night</li>
-                        <li>shukran → شكرًا / Thank you</li>
-                        <li>afwan → عفوًا / You're welcome</li>
-                        <li>la t7aty → لا تحاتي / Don't worry</li>
-                        <li>waink → وينك؟ / Where are you?</li>
-                    </ul>
-                </div>
             </div>
 
             <div class="controls">
@@ -661,7 +628,6 @@
         const sample = "Salam 3lykm";
         const history = [];
 
-        // Your backend on Render
         const API_BASE = "https://ezarabizi.onrender.com";
 
         function toggleLoading(isLoading) {
@@ -698,12 +664,11 @@
                 data?.translation ||
                 "—";
 
-            const englishFinal = data?.english || "Translation unavailable";
+            const englishFinal = data?.english || "English translation unavailable.";
 
             arabicOutputTextEl.textContent = arabicFinal;
             englishOutputTextEl.textContent = englishFinal;
 
-            // Arabic audio
             if (data?.arabic_audio_url) {
                 const url = data.arabic_audio_url.startsWith("http")
                     ? data.arabic_audio_url
@@ -715,7 +680,6 @@
                 arabicAudioEl.load();
             }
 
-            // English audio
             if (data?.english_audio_url) {
                 const url = data.english_audio_url.startsWith("http")
                     ? data.english_audio_url
@@ -727,7 +691,6 @@
                 englishAudioEl.load();
             }
 
-            // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
                 arabic: arabicFinal,
@@ -775,7 +738,6 @@
             }
         }
 
-        // Copy buttons (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
@@ -800,7 +762,6 @@
             }
         });
 
-        // Elder mode toggle
         elderToggleBtn.addEventListener("click", () => {
             document.body.classList.toggle("elder-mode");
             elderToggleBtn.textContent = document.body.classList.contains("elder-mode")
@@ -808,7 +769,6 @@
                 : "👵 Elder Mode";
         });
 
-        // Welcome screen logic
         startBtn.addEventListener("click", () => {
             welcomeOverlay.classList.add("hidden");
             setTimeout(() => {
@@ -818,7 +778,6 @@
             }, 300);
         });
 
-        // Character counter
         input.addEventListener("input", () => {
             const len = input.value.length;
             charCounterEl.textContent = `${len} character${len === 1 ? "" : "s"}`;
@@ -826,7 +785,6 @@
 
         translateBtn.addEventListener("click", handleTranslate);
 
-        // Try Sample: only fill the text, do NOT auto-translate
         demoBtn.addEventListener("click", () => {
             input.value = sample;
             const len = input.value.length;
