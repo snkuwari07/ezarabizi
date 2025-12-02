@@ -25,6 +25,9 @@ app = Flask(__name__, static_folder=".", static_url_path="")
 if CORS is not None:
     CORS(app)
 
+# Read Google API key from environment (Render)
+GOOGLE_API_KEY = os.environ.get("GOOGLE_TRANSLATE_API_KEY")
+
 # -------------------------------------------------
 # ARABIZI RULES
 # -------------------------------------------------
@@ -130,20 +133,23 @@ def smart_correct_arabic(text: str) -> str:
 
 
 # -------------------------------------------------
-# ARABIC → ENGLISH USING LIBRETRANSLATE / ARGOS
+# ARABIC → ENGLISH USING GOOGLE CLOUD TRANSLATE
 # -------------------------------------------------
 
 def translate_to_english(arabic_text: str):
     """
-    Uses a public LibreTranslate/Argos instance to translate Arabic -> English.
-    Returns the English text, or None if something goes wrong.
+    Arabic -> English using Google Cloud Translation API (v2).
+    Returns English text or None if it fails.
     """
     if not arabic_text.strip():
         return None
 
+    if not GOOGLE_API_KEY:
+        print("No GOOGLE_TRANSLATE_API_KEY set")
+        return None
+
     try:
-        # Public instance (good enough for class/demo use)
-        url = "https://translate.argosopentech.com/translate"
+        url = f"https://translation.googleapis.com/language/translate/v2?key={GOOGLE_API_KEY}"
 
         resp = requests.post(
             url,
@@ -153,19 +159,22 @@ def translate_to_english(arabic_text: str):
                 "target": "en",
                 "format": "text",
             },
-            headers={"Accept": "application/json"},
             timeout=8,
         )
 
         if resp.status_code != 200:
-            print("LibreTranslate error status:", resp.status_code, resp.text)
+            print("Google Translate error:", resp.status_code, resp.text)
             return None
 
         data = resp.json()
-        # LibreTranslate returns: {"translatedText": "..."}
-        return data.get("translatedText")
+        # shape: {"data": {"translations": [{"translatedText": "..."}]}}
+        translations = data.get("data", {}).get("translations", [])
+        if not translations:
+            return None
+
+        return translations[0].get("translatedText")
     except Exception as e:
-        print("LibreTranslate exception:", e)
+        print("Google Translate exception:", e)
         return None
 
 
@@ -208,8 +217,7 @@ def translate_endpoint():
         if "صباح الخير يا حبيبي" in arabic_corrected:
             english_text = "Good morning, my dear!"
         else:
-            english_text = "English (demo) translation for: " + arabic_corrected
-
+            english_text = "English translation is not available right now."
     print("🔹 english_text:", english_text)
 
     # Step 4: Audio with gTTS
