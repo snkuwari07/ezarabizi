@@ -2,12 +2,18 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
   <title>EzArabizi · Smart Arabizi Translator</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+    rel="stylesheet"
+  />
 
   <style>
     :root {
@@ -17,536 +23,610 @@
       --text-color: #1d1d1f;
       --accent: #ff5f6d;
       --accent-2: #ffc371;
-      --shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
-      --border-radius: 24px;
+      --shadow: 0 25px 60px rgba(15, 23, 42, 0.35);
     }
 
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
     body {
+      margin: 0;
       min-height: 100vh;
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
       background-image: var(--bg);
+      background-attachment: fixed;
+      color: var(--text-color);
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: 20px;
     }
 
-    .app {
+    .app-shell {
       width: 100%;
-      max-width: 900px;
+      max-width: 980px;
       background: var(--card-bg);
-      border-radius: var(--border-radius);
+      border-radius: 26px;
       box-shadow: var(--shadow);
-      padding: 24px 24px 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
+      padding: 28px 26px 30px;
+      position: relative;
+      overflow: hidden;
     }
 
-    .header {
+    .app-header {
       display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      align-items: center;
       flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
     }
 
-    .title-block {
+    .brand {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      align-items: center;
+      gap: 10px;
     }
 
-    .logo {
+    .logo-dot {
+      width: 34px;
+      height: 34px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
       font-weight: 700;
-      font-size: 1.5rem;
-      background: linear-gradient(120deg, #ff5f6d, #ffc371);
-      -webkit-background-clip: text;
-      color: transparent;
+      color: #fff;
+      font-size: 18px;
     }
 
-    .subtitle {
-      font-size: 0.9rem;
-      color: #555;
-      max-width: 440px;
+    .brand-text h1 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: 0.02em;
     }
 
-    .subtitle span {
-      font-weight: 600;
+    .brand-text p {
+      margin: 0;
+      font-size: 11px;
+      opacity: 0.7;
     }
 
-    .header-right {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .badge {
-      padding: 4px 10px;
+    .pill {
+      font-size: 11px;
+      background: rgba(15, 23, 42, 0.06);
+      padding: 4px 9px;
       border-radius: 999px;
-      font-size: 0.75rem;
-      background: rgba(0, 0, 0, 0.05);
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       white-space: nowrap;
     }
 
-    .badge-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: #16a085;
+    .pill span {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      opacity: 0.7;
     }
 
-    .learn-link {
-      padding: 6px 14px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      border: 1px solid rgba(0,0,0,0.12);
-      text-decoration: none;
-      color: #333;
-      background: white;
-    }
-
-    .learn-link:hover {
-      background: #f4f4f4;
-    }
-
-    .main {
+    .main-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr);
       gap: 18px;
     }
 
     @media (max-width: 768px) {
-      .main {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .header-right {
-        align-items: flex-start;
+      .main-grid {
+        grid-template-columns: 1fr;
       }
     }
 
-    .panel {
-      background: rgba(245, 245, 245, 0.9);
-      border-radius: 18px;
-      padding: 14px 14px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border: 1px solid rgba(0, 0, 0, 0.04);
+    .card {
+      background: rgba(255, 255, 255, 0.96);
+      border-radius: 20px;
+      padding: 16px 16px 18px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
     }
 
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      color: #666;
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 15px;
     }
 
-    .panel-label {
-      font-weight: 500;
-    }
-
-    .panel-extra {
-      font-size: 0.75rem;
-      opacity: 0.8;
+    .card p.card-subtitle {
+      margin: 0 0 12px;
+      font-size: 11px;
+      opacity: 0.75;
     }
 
     textarea {
       width: 100%;
-      min-height: 150px;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      padding: 10px 11px;
+      font-family: inherit;
+      font-size: 13px;
       resize: vertical;
-      border-radius: 12px;
-      padding: 10px 12px;
-      border: 1px solid rgba(0, 0, 0, 0.08);
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: var(--text-color);
+      min-height: 110px;
       outline: none;
-      background: white;
-    }
-
-    textarea::placeholder {
-      color: #aaa;
+      background: rgba(248, 250, 252, 0.95);
     }
 
     textarea:focus {
-      border-color: #ff5f6d;
+      border-color: var(--accent);
       box-shadow: 0 0 0 1px rgba(255, 95, 109, 0.25);
+      background: #fff;
     }
 
-    .output-box {
-      width: 100%;
-      min-height: 150px;
-      border-radius: 12px;
-      padding: 10px 12px;
-      border: 1px dashed rgba(0, 0, 0, 0.12);
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: var(--text-color);
-      background: white;
-      white-space: pre-wrap;
-      direction: rtl;
-      text-align: right;
-    }
-
-    .output-placeholder {
-      font-size: 0.85rem;
-      color: #999;
-    }
-
-    .audio-block {
-      margin-top: 8px;
+    .helper-row {
       display: flex;
-      flex-direction: column;
-      gap: 4px;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      gap: 8px;
+      font-size: 11px;
+      color: rgba(15, 23, 42, 0.7);
     }
 
-    .audio-label {
-      font-size: 0.8rem;
-      color: #666;
+    .helper-row button.sample-btn {
+      border: none;
+      background: none;
+      font-size: 11px;
+      padding: 0;
+      text-decoration: underline;
+      cursor: pointer;
+      opacity: 0.8;
     }
 
-    .buttons-row {
+    .btn-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 10px;
-      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 12px;
     }
 
-    button {
-      border: none;
+    .btn {
       border-radius: 999px;
-      padding: 8px 16px;
-      font-size: 0.9rem;
+      border: none;
       cursor: pointer;
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 500;
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.1s ease;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
-      transform: none !important;
-      box-shadow: none !important;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.12s ease;
     }
 
     .btn-primary {
-      background: linear-gradient(120deg, #ff5f6d, #ffc371);
-      color: white;
-      box-shadow: 0 8px 20px rgba(255, 95, 109, 0.3);
-    }
-
-    .btn-primary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 12px 25px rgba(255, 95, 109, 0.4);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #fff;
+      box-shadow: 0 12px 24px rgba(248, 113, 113, 0.32);
     }
 
     .btn-secondary {
-      background: rgba(0, 0, 0, 0.04);
-      color: #333;
+      background: rgba(15, 23, 42, 0.04);
+      color: #111827;
     }
 
-    .btn-secondary:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    .btn:active {
+      transform: translateY(1px);
+      box-shadow: none;
     }
 
-    .footer {
+    .btn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .output-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .output-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .output-box {
+      background: rgba(248, 250, 252, 0.9);
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      padding: 10px 12px 12px;
+      font-size: 13px;
+      min-height: 86px;
       display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      align-items: center;
-      font-size: 0.75rem;
-      color: #777;
-      flex-wrap: wrap;
-      margin-top: 4px;
-    }
-
-    .footer strong {
-      font-weight: 600;
-    }
-
-    .status {
-      display: flex;
-      align-items: center;
+      flex-direction: column;
       gap: 6px;
     }
 
-    .status-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #16a085;
+    .output-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.7;
     }
 
-    .status-dot.off {
-      background: #e74c3c;
+    .output-text {
+      font-size: 13px;
+      line-height: 1.5;
     }
 
-    .error-text {
-      color: #c0392b;
+    .output-text.ar {
+      direction: rtl;
+      text-align: right;
+      font-size: 15px;
+    }
+
+    .audio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 6px;
+    }
+
+    audio {
+      width: 100%;
+    }
+
+    .status-line {
+      font-size: 11px;
+      opacity: 0.75;
+      margin-top: 4px;
+      min-height: 16px;
     }
 
     /* Learn Arabizi section */
     .learn-card {
-      margin-top: 16px;
-      background: rgba(255,255,255,0.96);
-      border-radius: 18px;
-      padding: 16px 16px 14px;
-      border: 1px solid rgba(0,0,0,0.05);
-      font-size: 0.9rem;
-      color: #444;
+      margin-top: 8px;
+      background: rgba(248, 250, 252, 0.9);
+      border-radius: 16px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      padding: 10px 12px 12px;
+      font-size: 12px;
     }
 
-    .learn-card h2 {
-      font-size: 0.95rem;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
-      color: #777;
-      margin-bottom: 8px;
+    .learn-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .learn-header h3 {
+      margin: 0;
+      font-size: 13px;
     }
 
     .learn-list {
-      list-style: none;
-      padding-left: 0;
-      margin-top: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
     }
 
-    .learn-list li {
-      margin-bottom: 4px;
+    .learn-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 7px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px dashed rgba(15, 23, 42, 0.08);
     }
 
-    .learn-example {
-      font-size: 0.8rem;
-      color: #777;
-      margin-left: 4px;
+    .learn-item span {
+      font-size: 12px;
+    }
+
+    .learn-item .arabizi {
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .learn-item .arrow {
+      opacity: 0.5;
+      flex: 0 0 auto;
+    }
+
+    .learn-item .arabic {
+      font-weight: 600;
+      direction: rtl;
+      text-align: right;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 8px;
+      font-size: 10px;
+      opacity: 0.7;
+      text-align: right;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <header class="header">
-      <div class="title-block">
-        <div class="logo">EzArabizi</div>
-        <p class="subtitle">
-          Paste an <span>Arabizi</span> message, then translate it into clear Arabic –
-          so elders never feel left out of the conversation.
-        </p>
-      </div>
-
-      <div class="header-right">
-        <div class="badge">
-          <span class="badge-dot"></span>
-          Made for elders & families
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="brand">
+        <div class="logo-dot">E</div>
+        <div class="brand-text">
+          <h1>EzArabizi</h1>
+          <p>Arabizi → Arabic + English · with audio & learning</p>
         </div>
-        <a href="#learning" class="learn-link">Learn Arabizi</a>
+      </div>
+      <div class="pill">
+        <strong>For elders & families</strong>
+        <span>never left out of chats</span>
       </div>
     </header>
 
-    <main class="main">
-      <!-- Input Panel -->
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-label">1. Paste your Arabizi text</span>
-          <span class="panel-extra">Example: "9ba7 al5eir ya 7bibi!"</span>
-        </div>
-        <textarea id="inputText" placeholder="Write or paste your Arabizi message here..."></textarea>
+    <div class="main-grid">
+      <!-- LEFT: INPUT -->
+      <section class="card">
+        <h2>Paste your Arabizi text</h2>
+        <p class="card-subtitle">
+          Copy any Arabizi message here, then press <strong>Translate</strong> or
+          <strong>Learn Arabizi</strong>.
+        </p>
 
-        <div class="buttons-row">
-          <button id="sampleBtn" class="btn-secondary" type="button">
-            Try sample
+        <textarea
+          id="inputText"
+          placeholder="Example: 7abibi keif 7alk elyom? wallah istanast lamma klamna..."
+        ></textarea>
+
+        <div class="helper-row">
+          <button class="sample-btn" id="sampleBtn">
+            Use sample sentence
           </button>
-          <button id="clearBtn" class="btn-secondary" type="button">
-            Clear
-          </button>
-          <button id="translateBtn" class="btn-primary" type="button">
+          <span id="charCount">0 characters</span>
+        </div>
+
+        <div class="btn-row">
+          <!-- MAIN TRANSLATE -->
+          <button class="btn btn-primary" id="translateBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 5h16v2H5v5H3V6a1 1 0 0 1 1-1zm4.293 9.293L10.586 16H9v5h2v-2.764l1.707 1.707 1.414-1.414L8.707 12.879l-1.414 1.414zM14 11l3 8h2l3-8h-2.118L18 15.472 16.118 11H14z"
+              ></path>
+            </svg>
             Translate
           </button>
+
+          <!-- NEW: LEARN BUTTON -->
+          <button class="btn btn-secondary" id="learnBtn">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M4 4h16v2H4V4zm2 4h12v2H6V8zm0 4h8v2H6v-2zm0 4h6v2H6v-2z"
+              ></path>
+            </svg>
+            Learn Arabizi
+          </button>
+
+          <!-- OPTIONAL CLEAR -->
+          <button class="btn btn-secondary" id="clearBtn">
+            Clear
+          </button>
         </div>
+
+        <div class="status-line" id="statusText"></div>
       </section>
 
-      <!-- Output Panel (Arabic only + audio) -->
-      <section class="panel">
-        <div class="panel-header">
-          <span class="panel-label">2. Arabic translation</span>
-          <span class="panel-extra" id="statusLabel">Ready</span>
-        </div>
-        <div id="outputBox" class="output-box">
-          <span class="output-placeholder">Your Arabic translation will appear here.</span>
+      <!-- RIGHT: OUTPUT -->
+      <section class="card">
+        <h2>Result</h2>
+        <p class="card-subtitle">
+          You’ll see Arabic, English, audio, and a word-by-word learning view.
+        </p>
+
+        <div class="output-grid">
+          <!-- Arabic -->
+          <div class="output-box">
+            <div class="output-label">Arabic</div>
+            <div id="arabicCorrected" class="output-text ar"></div>
+          </div>
+
+          <!-- English -->
+          <div class="output-box">
+            <div class="output-label">English</div>
+            <div id="englishOutput" class="output-text"></div>
+          </div>
         </div>
 
-        <div class="audio-block">
-          <span class="audio-label">🔊 Listen in Arabic</span>
-          <audio id="arabicAudio" controls></audio>
+        <div class="audio-row">
+          <audio id="arabicAudio" controls style="display: none;"></audio>
+          <audio id="englishAudio" controls style="display: none;"></audio>
+        </div>
+
+        <!-- NEW: LEARN ARABIZI SECTION -->
+        <div class="learn-card" id="learnSection" style="display: none;">
+          <div class="learn-header">
+            <h3>Learn Arabizi (word by word)</h3>
+            <span style="font-size: 10px; opacity: 0.7;">
+              See how each Arabizi word becomes Arabic.
+            </span>
+          </div>
+          <div class="learn-list" id="learnList"></div>
+        </div>
+
+        <div class="footer-note">
+          Tip: you can share this page with elders so they can follow chats more easily.
         </div>
       </section>
-    </main>
-
-    <!-- Learn Arabizi section -->
-    <section id="learning" class="learn-card">
-      <h2>Learn Arabizi Basics</h2>
-      <p>Arabizi uses Latin letters and numbers to represent Arabic sounds. Here are some common mappings:</p>
-      <ul class="learn-list">
-        <li><strong>2 → أ / ء</strong> <span class="learn-example">Example: 2ali → علي</span></li>
-        <li><strong>3 → ع</strong> <span class="learn-example">Example: 3ali → علي</span></li>
-        <li><strong>5 → خ</strong> <span class="learn-example">Example: 5aled → خالد</span></li>
-        <li><strong>6 → ط</strong> <span class="learn-example">Example: 6aleb → طالب</span></li>
-        <li><strong>7 → ح</strong> <span class="learn-example">Example: 7ob → حب</span></li>
-        <li><strong>8 → ق (in Gulf Arabizi)</strong> <span class="learn-example">Example: 8alb → قلب</span></li>
-        <li><strong>9 → ص</strong> <span class="learn-example">Example: 9ba7 → صباح</span></li>
-      </ul>
-      <p>Common letter combinations:</p>
-      <ul class="learn-list">
-        <li><strong>sh → ش</strong> <span class="learn-example">Example: shlonk → شلونك</span></li>
-        <li><strong>kh → خ</strong> <span class="learn-example">Example: khaled / 5aled → خالد</span></li>
-        <li><strong>th → ث</strong> <span class="learn-example">Example: thalatha → ثلاثة</span></li>
-        <li><strong>gh → غ</strong> <span class="learn-example">Example: 3'arb / gharb → غرب</span></li>
-      </ul>
-    </section>
-
-    <footer class="footer">
-      <div>
-        <strong>Tip:</strong> You can copy the Arabic text and send it directly to your elders.
-      </div>
-      <div class="status">
-        <span id="statusDot" class="status-dot"></span>
-        <span id="statusText">Connected</span>
-      </div>
-    </footer>
+    </div>
   </div>
 
   <script>
-    // Backend base (Render)
-    const BACKEND_BASE = "https://ezarabizi.onrender.com";
-    const API_URL = BACKEND_BASE + "/translate";
-
-    const inputText   = document.getElementById("inputText");
-    const outputBox   = document.getElementById("outputBox");
+    const inputText = document.getElementById("inputText");
+    const sampleBtn = document.getElementById("sampleBtn");
     const translateBtn = document.getElementById("translateBtn");
-    const sampleBtn   = document.getElementById("sampleBtn");
-    const clearBtn    = document.getElementById("clearBtn");
-    const statusDot   = document.getElementById("statusDot");
-    const statusText  = document.getElementById("statusText");
-    const statusLabel = document.getElementById("statusLabel");
+    const learnBtn = document.getElementById("learnBtn");
+    const clearBtn = document.getElementById("clearBtn");
+    const charCount = document.getElementById("charCount");
+    const statusText = document.getElementById("statusText");
+
+    const arabicCorrected = document.getElementById("arabicCorrected");
+    const englishOutput = document.getElementById("englishOutput");
     const arabicAudio = document.getElementById("arabicAudio");
+    const englishAudio = document.getElementById("englishAudio");
 
-    function setLoading(isLoading) {
-      if (isLoading) {
-        translateBtn.disabled = true;
-        sampleBtn.disabled = true;
-        clearBtn.disabled = true;
-        statusLabel.textContent = "Translating...";
-        statusText.textContent = "Translating...";
-      } else {
-        translateBtn.disabled = false;
-        sampleBtn.disabled = false;
-        clearBtn.disabled = false;
-        statusLabel.textContent = "Ready";
-        statusText.textContent = "Connected";
-      }
+    const learnSection = document.getElementById("learnSection");
+    const learnList = document.getElementById("learnList");
+
+    // Update character count
+    function updateCharCount() {
+      const len = inputText.value.length;
+      charCount.textContent = len + " characters";
     }
 
-    function showError(msg) {
-      outputBox.innerHTML = "<span class='error-text'>" + msg + "</span>";
+    inputText.addEventListener("input", updateCharCount);
+
+    // Sample text
+    sampleBtn.addEventListener("click", () => {
+      inputText.value = "7abibi keif 7alk elyom? wallah istanast lamma klamna bar7a.";
+      updateCharCount();
+    });
+
+    // Clear everything
+    clearBtn.addEventListener("click", () => {
+      inputText.value = "";
+      updateCharCount();
+
+      arabicCorrected.textContent = "";
+      englishOutput.textContent = "";
+      arabicAudio.style.display = "none";
+      englishAudio.style.display = "none";
       arabicAudio.removeAttribute("src");
-      arabicAudio.load();
-      statusDot.classList.add("off");
-      statusText.textContent = "Error";
+      englishAudio.removeAttribute("src");
+
+      learnSection.style.display = "none";
+      learnList.innerHTML = "";
+      statusText.textContent = "";
+    });
+
+    // Helper: show loading state
+    function setStatus(msg) {
+      statusText.textContent = msg || "";
     }
 
-    async function translate() {
+    // Helper: error toast
+    function showError(msg) {
+      statusText.textContent = msg;
+      statusText.style.color = "#b91c1c";
+      setTimeout(() => {
+        statusText.style.color = "inherit";
+      }, 2500);
+    }
+
+    // TRANSLATE BUTTON
+    translateBtn.addEventListener("click", async () => {
       const text = inputText.value.trim();
       if (!text) {
-        showError("Please write or paste some Arabizi text first.");
+        showError("Please paste or type some Arabizi text first.");
         return;
       }
 
-      setLoading(true);
-      statusDot.classList.remove("off");
-
+      setStatus("Translating…");
       try {
-        const response = await fetch(API_URL, {
+        const res = await fetch("/translate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text }),
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-          console.error("Server error:", data);
-          showError(data.error || "Something went wrong with the translation.");
-        } else {
-          // Use the Arabic from your Flask response
-          const arabicText =
-            data.arabic_corrected ||
-            data.arabic_raw ||
-            data.translation ||
-            data.result ||
-            "No result received.";
-
-          outputBox.textContent = arabicText;
-
-          // Arabic audio (from gTTS, /audio/xxx.mp3)
-          if (data.arabic_audio_url) {
-            const url = data.arabic_audio_url.startsWith("http")
-              ? data.arabic_audio_url
-              : BACKEND_BASE + data.arabic_audio_url;
-            arabicAudio.src = url;
-            arabicAudio.load();
-          } else {
-            arabicAudio.removeAttribute("src");
-            arabicAudio.load();
-          }
+        if (!res.ok) {
+          throw new Error("Server error");
         }
+
+        const data = await res.json();
+
+        // Fill outputs
+        arabicCorrected.textContent = data.arabic_corrected || "";
+        englishOutput.textContent = data.english || "";
+
+        // Audio
+        if (data.arabic_audio_url) {
+          arabicAudio.src = data.arabic_audio_url;
+          arabicAudio.style.display = "block";
+        } else {
+          arabicAudio.style.display = "none";
+        }
+
+        if (data.english_audio_url) {
+          englishAudio.src = data.english_audio_url;
+          englishAudio.style.display = "block";
+        } else {
+          englishAudio.style.display = "none";
+        }
+
+        setStatus("Done ✔ Translation ready.");
       } catch (err) {
-        console.error("Network error:", err);
-        showError("Cannot reach the server. Check your connection or backend URL.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    translateBtn.addEventListener("click", translate);
-
-    sampleBtn.addEventListener("click", () => {
-      inputText.value = "9ba7 al5eir ya 7bibi!";
-      outputBox.innerHTML =
-        "<span class='output-placeholder'>Now press Translate to see the result.</span>";
-      arabicAudio.removeAttribute("src");
-      arabicAudio.load();
-    });
-
-    clearBtn.addEventListener("click", () => {
-      inputText.value = "";
-      outputBox.innerHTML =
-        "<span class='output-placeholder'>Your Arabic translation will appear here.</span>";
-      statusDot.classList.remove("off");
-      statusText.textContent = "Connected";
-      statusLabel.textContent = "Ready";
-      arabicAudio.removeAttribute("src");
-      arabicAudio.load();
-    });
-
-    // Ctrl+Enter to translate
-    inputText.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
-        translate();
+        console.error(err);
+        showError("Something went wrong. Please try again.");
       }
     });
+
+    // LEARN BUTTON (NEW) – calls /learn
+    learnBtn.addEventListener("click", async () => {
+      const text = inputText.value.trim();
+      if (!text) {
+        showError("Please paste or type some Arabizi text first.");
+        return;
+      }
+
+      setStatus("Building word-by-word view…");
+      try {
+        const res = await fetch("/learn", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text }),
+        });
+
+        if (!res.ok) {
+          throw new Error("Server error");
+        }
+
+        const data = await res.json();
+
+        const explanation = data.explanation || [];
+
+        if (!explanation.length) {
+          learnSection.style.display = "none";
+          learnList.innerHTML = "";
+          setStatus("No words to show in Learn view.");
+          return;
+        }
+
+        // Render each word pair
+        learnList.innerHTML = explanation
+          .map(
+            (item) => `
+            <div class="learn-item">
+              <span class="arabizi">${item.arabizi}</span>
+              <span class="arrow">→</span>
+              <span class="arabic">${item.arabic}</span>
+            </div>
+          `
+          )
+          .join("");
+
+        learnSection.style.display = "block";
+        setStatus("Done ✔ Learn view updated.");
+      } catch (err) {
+        console.error(err);
+        showError("Could not load Learn view. Please try again.");
+      }
+    });
+
+    // Init counter
+    updateCharCount();
   </script>
 </body>
 </html>
