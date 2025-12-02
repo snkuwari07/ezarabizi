@@ -6,17 +6,12 @@ CORS(app)
 
 
 def normalize(text: str) -> str:
-    """Lowercase and collapse extra spaces so inputs like '  Salam   3lykm ' still match."""
+    # Lowercase + remove extra spaces
     return " ".join(text.strip().lower().split())
 
 
-# PHRASE DICTIONARY
-# key = Arabizi phrase (normalized)
-# arabic = Arabic sentence
-# english = English sentence
-# arabic_audio / english_audio = paths in /static/audio
 PHRASES = {
-    # 🔹 Your phrases
+    # ----- Your phrases -----
     "salam 3lykm": {
         "arabic": "السلام عليكم",
         "english": "Peace be upon you",
@@ -54,7 +49,7 @@ PHRASES = {
         "english_audio": "/static/audio/m3_alslamh_en.mp3",
     },
 
-    # 🔹 Extra phrases I added
+    # ----- Extra phrases -----
     "msa2 al5eir": {
         "arabic": "مساء الخير",
         "english": "Good evening",
@@ -111,7 +106,7 @@ def translate():
             "arabic_raw": msg_ar,
             "arabic_corrected": msg_ar,
             "translation": msg_ar,
-            "english": "Translation unavailable",
+            "english": "English translation unavailable.",
             "arabic_audio_url": None,
             "english_audio_url": None,
         })
