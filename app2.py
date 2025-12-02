@@ -132,58 +132,6 @@ def smart_correct_arabic(text: str) -> str:
     corrected_words = [word_map.get(w, w) for w in words]
     return " ".join(corrected_words)
 
-
-# -------------------------------------------------
-# NEW: LEARN FEATURE (for "Learn Arabizi" button)
-# -------------------------------------------------
-
-def explain_arabizi(text: str):
-    """
-    Break the sentence into words and show how each Arabizi word
-    was converted into Arabic. Useful for a 'Learn Arabizi' view.
-    """
-    words = text.lower().split()
-    explanation = []
-
-    for w in words:
-        arabic = translate_arabizi(w)
-        explanation.append({
-            "arabizi": w,
-            "arabic": arabic
-        })
-
-    return explanation
-
-
-@app.route("/learn", methods=["POST"])
-def learn_endpoint():
-    """
-    JSON in:
-      { "text": "7abibi keif 7alk" }
-
-    JSON out:
-      {
-        "input": "7abibi keif 7alk",
-        "explanation": [
-          { "arabizi": "7abibi", "arabic": "حبيبي" },
-          { "arabizi": "keif", "arabic": "كيف" },
-          { "arabizi": "7alk", "arabic": "حالك" }
-        ]
-      }
-    """
-    data = request.get_json()
-    if not data or "text" not in data:
-        return jsonify({"error": "Missing 'text'"}), 400
-
-    arabizi_text = data["text"]
-    explanation = explain_arabizi(arabizi_text)
-
-    return jsonify({
-        "input": arabizi_text,
-        "explanation": explanation
-    })
-
-
 # -------------------------------------------------
 # API ROUTES
 # -------------------------------------------------
