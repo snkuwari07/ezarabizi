@@ -2,9 +2,9 @@ from flask import Flask, request, jsonify, send_from_directory
 import re
 import os
 import uuid
+import requests  # NEW: for calling LibreTranslate
 
-# googletrans + gTTS
-from googletrans import Translator
+# gTTS for audio
 from gtts import gTTS
 
 # CORS (for your Netlify / Sites frontend)
@@ -26,8 +26,6 @@ app = Flask(__name__, static_folder=".", static_url_path="")
 
 if CORS is not None:
     CORS(app)
-
-translator = Translator()
 
 # -------------------------------------------------
 # ARABIZI RULES
@@ -132,6 +130,46 @@ def smart_correct_arabic(text: str) -> str:
     corrected_words = [word_map.get(w, w) for w in words]
     return " ".join(corrected_words)
 
+
+# -------------------------------------------------
+# NEW: Arabic → English using LibreTranslate
+# -------------------------------------------------
+
+def translate_to_english(arabic_text: str) -> str | None:
+    """
+    Uses LibreTranslate public API to translate Arabic -> English.
+    Returns the English text, or None if something goes wrong.
+    """
+    if not arabic_text.strip():
+        return None
+
+    try:
+        # Public instance of LibreTranslate (good for demos / class projects)
+        url = "https://libretranslate.de/translate"
+
+        resp = requests.post(
+            url,
+            data={
+                "q": arabic_text,
+                "source": "ar",
+                "target": "en",
+                "format": "text",
+            },
+            timeout=8,
+        )
+
+        if resp.status_code != 200:
+            print("LibreTranslate error status:", resp.status_code, resp.text)
+            return None
+
+        data = resp.json()
+        # LibreTranslate returns: {"translatedText": "..."}
+        return data.get("translatedText")
+    except Exception as e:
+        print("LibreTranslate exception:", e)
+        return None
+
+
 # -------------------------------------------------
 # API ROUTES
 # -------------------------------------------------
@@ -159,17 +197,14 @@ def translate_endpoint():
     arabic_corrected = smart_correct_arabic(arabic_raw)
     print("🔹 arabic_corrected:", arabic_corrected)
 
-    # Step 3: Arabic -> English
+    # Step 3: Arabic -> English (via LibreTranslate)
     english_text = None
     try:
-        if arabic_corrected.strip():
-            english_text = translator.translate(
-                arabic_corrected, src="ar", dest="en"
-            ).text
+        english_text = translate_to_english(arabic_corrected)
     except Exception as e:
-        print("Translation error:", e)
+        print("Translation wrapper error:", e)
 
-    # simple fallback if googletrans fails
+    # simple fallback if translation API fails
     if not english_text:
         if "صباح الخير يا حبيبي" in arabic_corrected:
             english_text = "Good morning, my dear!"
@@ -187,7 +222,6 @@ def translate_endpoint():
             arabic_filename = f"arabic_{uuid.uuid4().hex}.mp3"
             arabic_path = os.path.join(AUDIO_DIR, arabic_filename)
             gTTS(arabic_corrected, lang="ar").save(arabic_path)
-            # IMPORTANT: return a RELATIVE url
             arabic_audio_url = f"/audio/{arabic_filename}"
 
         if english_text and english_text.strip():
