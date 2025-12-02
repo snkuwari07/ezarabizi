@@ -403,6 +403,11 @@
             text-align: right;
         }
 
+        .history-english {
+            margin-top: 0.15rem;
+            color: #333;
+        }
+
         body.elder-mode {
             background: #f2f2f2;
         }
@@ -441,7 +446,6 @@
 
             header {
                 flex-direction: column;
-                align-items: flex-start;
             }
 
             .header-actions {
@@ -483,6 +487,7 @@
             font-size: 1rem;
             color: #555;
             margin-bottom: 1.5rem;
+            text-align: left;
         }
 
         .welcome-btn {
@@ -506,6 +511,21 @@
             opacity: 0;
             pointer-events: none;
         }
+
+        .phrase-hints {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #555;
+        }
+
+        .phrase-hints ul {
+            margin-top: 0.35rem;
+            padding-left: 1rem;
+        }
+
+        .phrase-hints li {
+            margin-bottom: 0.15rem;
+        }
     </style>
 </head>
 <body>
@@ -513,11 +533,9 @@
     <div id="welcomeOverlay" class="welcome-overlay">
         <div class="welcome-inner">
             <h2 class="welcome-title">Welcome to EzArabizi</h2>
-
-            <p class="welcome-text" style="text-align: left;">
-                EzArabizi helps elders and families understand Arabizi chats by turning them into clear Arabic with audio they can listen to easily. It makes sure elders never feel left out of conversations with the younger generation.
+            <p class="welcome-text">
+                EzArabizi helps elders and families understand common Arabizi phrases by turning them into clear Arabic and English, with audio in both languages. It makes sure elders never feel left out of conversations with the younger generation.
             </p>
-
             <button id="startBtn" class="welcome-btn">Start Translating</button>
         </div>
     </div>
@@ -528,7 +546,7 @@
                 <div class="logo-badge">Ez</div>
                 <div>
                     <h1>EzArabizi</h1>
-                    <p>Enter your Arabizi message and press Translate.</p>
+                    <p>Type a common Arabizi phrase and press Translate.</p>
                 </div>
             </div>
             <div class="header-actions">
@@ -540,15 +558,34 @@
         <section id="translator" class="translator-card">
             <div>
                 <label for="inputText">Arabizi Input</label>
-                <textarea id="inputText" placeholder="e.g. 'sabah el kheir ya habibi'"></textarea>
+                <textarea id="inputText" placeholder="Try: Salam 3lykm"></textarea>
                 <div id="charCounter" class="char-counter">0 characters</div>
+
+                <div class="phrase-hints">
+                    <strong>Common phrases you can try:</strong>
+                    <ul>
+                        <li>Salam 3lykm → السلام عليكم / Peace be upon you</li>
+                        <li>Kif 7alk → كيف حالك؟ / How are you?</li>
+                        <li>Ana b5eir → أنا بخير / I'm fine</li>
+                        <li>Ana t3ban → أنا تعبان / I'm tired</li>
+                        <li>9ba7 al5eir → صباح الخير / Good morning</li>
+                        <li>m3 alslamh → مع السلامة / Goodbye</li>
+                        <li>msa2 al5eir → مساء الخير / Good evening</li>
+                        <li>t9b7 3la 5eir → تصبح على خير / Good night</li>
+                        <li>shukran → شكرًا / Thank you</li>
+                        <li>afwan → عفوًا / You're welcome</li>
+                        <li>la t7aty → لا تحاتي / Don't worry</li>
+                        <li>waink → وينك؟ / Where are you?</li>
+                    </ul>
+                </div>
             </div>
+
             <div class="controls">
                 <button class="secondary" id="demoFill">Try Sample</button>
                 <button class="primary" id="translateBtn">Translate</button>
             </div>
 
-            <!-- SINGLE BOX: ARABIC ONLY -->
+            <!-- TWO BOXES: ARABIC + ENGLISH -->
             <div class="results-grid">
                 <article>
                     <h3>Arabic</h3>
@@ -559,13 +596,24 @@
                         </span>
                     </div>
                 </article>
+                <article>
+                    <h3>English</h3>
+                    <div id="englishOutput" class="output" dir="ltr" style="text-align:left; direction:ltr;">
+                        <button class="copy-btn" data-target="englishOutput">Copy</button>
+                        <span id="englishOutputText" class="text">—</span>
+                    </div>
+                </article>
             </div>
 
-            <!-- ARABIC AUDIO ONLY -->
+            <!-- INLINE AUDIO PLAYERS -->
             <div class="audio-row">
                 <div class="audio-block">
                     <div class="audio-label">🔊 Listen in Arabic</div>
                     <audio id="arabicAudio" controls></audio>
+                </div>
+                <div class="audio-block">
+                    <div class="audio-label">🔊 Listen in English</div>
+                    <audio id="englishAudio" controls></audio>
                 </div>
             </div>
 
@@ -587,7 +635,7 @@
             <p>Made by Saad and Sari</p>
             <p class="footer-contact">
                 Contact:
-                <span id="contactDetails">snkuwari@andrew.cmu.edu/sabulrub@andrew.cmu.edu</span>
+                <span id="contactDetails">snkuwari@andrew.cmu.edu / sabulrub@andrew.cmu.edu</span>
             </p>
         </footer>
     </main>
@@ -598,8 +646,10 @@
         const demoBtn = document.getElementById("demoFill");
 
         const arabicOutputTextEl = document.getElementById("arabicOutputText");
+        const englishOutputTextEl = document.getElementById("englishOutputText");
 
         const arabicAudioEl = document.getElementById("arabicAudio");
+        const englishAudioEl = document.getElementById("englishAudio");
         const statusEl = document.getElementById("status");
         const elderToggleBtn = document.getElementById("elderToggle");
         const historyListEl = document.getElementById("historyList");
@@ -608,7 +658,7 @@
         const welcomeOverlay = document.getElementById("welcomeOverlay");
         const startBtn = document.getElementById("startBtn");
 
-        const sample = "9ba7 al5eir ya 7bibi!";
+        const sample = "Salam 3lykm";
         const history = [];
 
         // Your backend on Render
@@ -635,20 +685,23 @@
                 div.innerHTML = `
                     <div class="history-arabizi"><strong>Arabizi:</strong> ${item.input}</div>
                     <div class="history-arabic">${item.arabic}</div>
+                    <div class="history-english"><strong>English:</strong> ${item.english}</div>
                 `;
                 historyListEl.appendChild(div);
             });
         }
 
         function renderResults(data, originalInput) {
-            // Decide which Arabic to show
             const arabicFinal =
                 data?.arabic_corrected ||
                 data?.arabic_raw ||
                 data?.translation ||
                 "—";
 
+            const englishFinal = data?.english || "Translation unavailable";
+
             arabicOutputTextEl.textContent = arabicFinal;
+            englishOutputTextEl.textContent = englishFinal;
 
             // Arabic audio
             if (data?.arabic_audio_url) {
@@ -662,10 +715,23 @@
                 arabicAudioEl.load();
             }
 
+            // English audio
+            if (data?.english_audio_url) {
+                const url = data.english_audio_url.startsWith("http")
+                    ? data.english_audio_url
+                    : `${API_BASE}${data.english_audio_url}`;
+                englishAudioEl.src = url;
+                englishAudioEl.load();
+            } else {
+                englishAudioEl.removeAttribute("src");
+                englishAudioEl.load();
+            }
+
             // Update history (keep last 5)
             history.unshift({
                 input: originalInput,
                 arabic: arabicFinal,
+                english: englishFinal,
             });
             if (history.length > 5) history.pop();
             renderHistory();
@@ -692,8 +758,13 @@
                 }
 
                 const data = await response.json();
-                renderResults(data, text);
-                statusEl.textContent = "Translation complete.";
+                if (data.error) {
+                    statusEl.textContent = data.error;
+                    statusEl.classList.add("error");
+                } else {
+                    renderResults(data, text);
+                    statusEl.textContent = "Translation complete.";
+                }
             } catch (error) {
                 console.error(error);
                 statusEl.textContent =
@@ -704,13 +775,16 @@
             }
         }
 
-        // Copy button (Arabic only)
+        // Copy buttons (Arabic + English)
         document.addEventListener("click", async (e) => {
             if (e.target.matches(".copy-btn")) {
                 const targetId = e.target.getAttribute("data-target");
                 let text = "";
                 if (targetId === "arabicOutput") {
                     text = arabicOutputTextEl.textContent.trim();
+                }
+                if (targetId === "englishOutput") {
+                    text = englishOutputTextEl.textContent.trim();
                 }
 
                 try {
